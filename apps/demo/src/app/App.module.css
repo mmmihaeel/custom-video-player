@@ -1,0 +1,499 @@
+.page {
+  min-height: 100vh;
+  padding: 46px 20px 84px;
+}
+
+.shell {
+  display: grid;
+  gap: 28px;
+  margin: 0 auto;
+  max-width: 1280px;
+}
+
+.hero,
+.stage,
+.twoColumn {
+  display: grid;
+  gap: 22px;
+}
+
+.hero {
+  align-items: start;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 380px);
+}
+
+.heroCopy,
+.commandCard,
+.playerCard,
+.eventCard,
+.playgroundCard,
+.panel {
+  animation: rise 620ms ease both;
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 24px 56px rgba(20, 25, 40, 0.08);
+  border-radius: 30px;
+  min-width: 0;
+  padding: 24px;
+}
+
+.heroCopy,
+.commandCard,
+.previewColumn,
+.playgroundCard,
+.docsSection {
+  display: grid;
+  gap: 20px;
+}
+
+.eyebrow,
+.sectionLabel {
+  color: #6d7892;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  color: #131825;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  letter-spacing: -0.06em;
+  line-height: 0.92;
+  margin: 0;
+  max-width: 11ch;
+}
+
+.lead,
+.helperNote,
+.errorNote,
+.infoList {
+  color: #55617b;
+  line-height: 1.68;
+  margin: 0;
+}
+
+.lead {
+  font-size: 1.05rem;
+  max-width: 60ch;
+}
+
+.heroActions,
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primaryAction,
+.secondaryAction,
+.primaryButton,
+.secondaryButton {
+  align-items: center;
+  appearance: none;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 500;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  text-decoration: none;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.primaryAction,
+.primaryButton {
+  background: #151a25;
+  border: 1px solid #151a25;
+  color: #ffffff;
+}
+
+.secondaryAction,
+.secondaryButton {
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(20, 26, 40, 0.1);
+  color: #1b2234;
+}
+
+.primaryAction:hover,
+.secondaryAction:hover,
+.primaryButton:hover,
+.secondaryButton:hover,
+.presetButton:hover {
+  transform: translateY(-1px);
+}
+
+.primaryButton:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.presetButton:focus-visible {
+  border-color: rgba(21, 26, 37, 0.2);
+  outline: 2px solid rgba(21, 26, 37, 0.12);
+  outline-offset: 1px;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badgeRow span {
+  background: rgba(20, 26, 40, 0.06);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 999px;
+  color: #25304a;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+  padding: 10px 14px;
+}
+
+.cardHeader {
+  display: grid;
+  gap: 8px;
+}
+
+.cardTitle {
+  color: #151b2a;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.commandList {
+  display: grid;
+  gap: 12px;
+}
+
+.commandItem {
+  background: #171b25;
+  border-radius: 18px;
+  color: #f3f6fd;
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+.commandItem span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.commandItem code,
+.codeBlock {
+  font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.metricGrid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metricCard {
+  background: rgba(20, 26, 40, 0.03);
+  border: 1px solid rgba(20, 26, 40, 0.06);
+  border-radius: 20px;
+  display: grid;
+  gap: 6px;
+  min-height: 104px;
+  padding: 18px;
+}
+
+.metricLabel {
+  color: #6f7992;
+  font-size: 0.82rem;
+}
+
+.stage {
+  align-items: start;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
+}
+
+.previewColumn {
+  display: grid;
+  gap: 18px;
+}
+
+.eventList,
+.infoList {
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.stateGrid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stateCard {
+  background: rgba(20, 26, 40, 0.03);
+  border: 1px solid rgba(20, 26, 40, 0.06);
+  border-radius: 18px;
+  display: grid;
+  gap: 6px;
+  min-height: 88px;
+  padding: 14px;
+}
+
+.stateCard span {
+  color: #6f7992;
+  font-size: 0.8rem;
+}
+
+.stateCard strong {
+  color: #151b2a;
+  font-size: 1rem;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.presetList {
+  display: grid;
+  gap: 10px;
+}
+
+.presetButton {
+  appearance: none;
+  background: rgba(20, 26, 40, 0.03);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 18px;
+  color: #1d2435;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 4px;
+  padding: 14px 16px;
+  text-align: left;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.presetButton strong {
+  font-size: 0.94rem;
+}
+
+.presetButton span {
+  color: #5f6b84;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: #5c6883;
+  display: flex;
+  font-size: 0.88rem;
+  font-weight: 500;
+  justify-content: space-between;
+}
+
+.field input,
+.field select,
+.field textarea {
+  appearance: none;
+  background: rgba(20, 26, 40, 0.04);
+  border: 1px solid rgba(20, 26, 40, 0.1);
+  border-radius: 16px;
+  color: #1d2435;
+  font: inherit;
+  inline-size: 100%;
+  padding: 12px 14px;
+}
+
+.field textarea {
+  min-block-size: 220px;
+  resize: vertical;
+}
+
+.field input[type='range'] {
+  accent-color: #161b25;
+  margin: 0;
+  padding: 0;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: rgba(21, 26, 37, 0.2);
+  outline: 2px solid rgba(21, 26, 37, 0.12);
+  outline-offset: 1px;
+}
+
+.toggleRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toggleRow label {
+  align-items: center;
+  background: rgba(20, 26, 40, 0.04);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 999px;
+  color: #23304a;
+  display: inline-flex;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.toggleRow input {
+  margin: 0;
+}
+
+.errorNote {
+  background: rgba(160, 31, 31, 0.08);
+  border: 1px solid rgba(160, 31, 31, 0.14);
+  border-radius: 14px;
+  color: #8e2424;
+  padding: 12px 14px;
+}
+
+.docsSection {
+  display: grid;
+  gap: 22px;
+}
+
+.twoColumn {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.codeBlock {
+  background: #161b25;
+  border-radius: 20px;
+  color: #f4f7ff;
+  font-size: 0.9rem;
+  margin: 0;
+  overflow-x: auto;
+  padding: 16px 18px;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid rgba(20, 26, 40, 0.08);
+  padding: 12px 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  color: #57627d;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.table td {
+  color: #23304a;
+}
+
+.table code,
+.commandItem code {
+  font-size: 0.88rem;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1120px) {
+  .hero,
+  .stage,
+  .twoColumn {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 26px 14px 48px;
+  }
+
+  .heroCopy,
+  .commandCard,
+  .playerCard,
+  .eventCard,
+  .playgroundCard,
+  .panel {
+    border-radius: 24px;
+    padding: 18px;
+  }
+
+  .metricGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .heroActions,
+  .actionRow {
+    flex-direction: column;
+  }
+
+  .primaryAction,
+  .secondaryAction,
+  .primaryButton,
+  .secondaryButton {
+    inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroCopy,
+  .commandCard,
+  .playerCard,
+  .eventCard,
+  .playgroundCard,
+  .panel {
+    animation: none;
+  }
+
+  .primaryAction,
+  .secondaryAction,
+  .primaryButton,
+  .secondaryButton {
+    transition: none;
+  }
+}

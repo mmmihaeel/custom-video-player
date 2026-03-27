@@ -1,0 +1,41 @@
+{
+  "name": "custom-video-player-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "author": "mmmihaeel",
+  "homepage": "https://github.com/mmmihaeel/custom-video-player#readme",
+  "packageManager": "pnpm@10.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mmmihaeel/custom-video-player.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mmmihaeel/custom-video-player/issues"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter demo dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:e2e": "playwright test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "preview": "pnpm --filter demo preview",
+    "validate": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "playwright": "^1.58.2",
+    "prettier": "^3.8.1"
+  }
+}

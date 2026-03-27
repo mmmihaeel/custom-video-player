@@ -1,0 +1,591 @@
+.root {
+  --cvp-control: #ffffff;
+  --cvp-menu: rgba(20, 20, 24, 0.96);
+  --cvp-menu-border: rgba(255, 255, 255, 0.08);
+  --cvp-rail: rgba(255, 255, 255, 0.34);
+  --cvp-buffered: rgba(255, 255, 255, 0.2);
+  --cvp-segment: rgba(151, 163, 194, 0.6);
+  --cvp-shadow: 0 24px 50px rgba(12, 12, 15, 0.32);
+  color: var(--cvp-control);
+  display: block;
+  inline-size: 100%;
+}
+
+.surface {
+  aspect-ratio: 16 / 9;
+  background: #101114;
+  border-radius: 18px;
+  box-shadow: var(--cvp-shadow);
+  isolation: isolate;
+  overflow: hidden;
+  position: relative;
+}
+
+.surface[data-fullscreen] {
+  block-size: 100%;
+  border-radius: 0;
+}
+
+.video {
+  block-size: 100%;
+  cursor: pointer;
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.scrim {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(9, 10, 14, 0) 0%,
+      rgba(9, 10, 14, 0) 42%,
+      rgba(9, 10, 14, 0.72) 84%,
+      rgba(9, 10, 14, 0.86) 100%
+    ),
+    linear-gradient(180deg, rgba(9, 10, 14, 0.12) 0%, rgba(9, 10, 14, 0) 24%);
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+}
+
+.controls {
+  inset: auto 0 0;
+  padding: 0 18px 15px;
+  position: absolute;
+  z-index: 3;
+}
+
+.timelineGroup {
+  margin-block-end: 10px;
+  position: relative;
+}
+
+.timeline {
+  block-size: 24px;
+  cursor: pointer;
+  inline-size: 100%;
+  outline: none;
+  position: relative;
+  touch-action: none;
+}
+
+.timelineRail,
+.timelineBuffered,
+.timelineProgress {
+  block-size: 3px;
+  border-radius: 999px;
+  inset-block-start: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+.timelineRail {
+  background: var(--cvp-rail);
+  inset-inline: 0;
+}
+
+.timelineBuffered {
+  background: var(--cvp-buffered);
+  inset-inline-start: 0;
+}
+
+.chapterSegments {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.chapterSegment {
+  background: var(--cvp-segment);
+  block-size: 3px;
+  border-radius: 999px;
+  inset-block-start: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+.chapterSegment::after {
+  background: rgba(255, 255, 255, 0.72);
+  block-size: 13px;
+  border-radius: 999px;
+  content: '';
+  inline-size: 1.5px;
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+.timelineProgress {
+  background: #ffffff;
+  inset-inline-start: 0;
+}
+
+.timelineThumb,
+.timelinePreview {
+  inset-block-start: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.timelineThumb {
+  background: #ffffff;
+  block-size: 18px;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 10px 18px rgba(10, 10, 14, 0.28);
+  inline-size: 4px;
+}
+
+.timelinePreview {
+  background: rgba(255, 255, 255, 0.82);
+  block-size: 14px;
+  border-radius: 999px;
+  inline-size: 1.5px;
+}
+
+.timeline:hover .timelineThumb,
+.timeline:focus-visible .timelineThumb {
+  inline-size: 5px;
+}
+
+.tooltip {
+  background: rgba(29, 29, 33, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  bottom: 100%;
+  box-shadow: 0 20px 34px rgba(10, 10, 12, 0.26);
+  min-inline-size: 192px;
+  padding: 12px 16px 11px;
+  position: absolute;
+  text-align: center;
+  transform: translateY(-10px);
+}
+
+.tooltip::after {
+  background: inherit;
+  block-size: 12px;
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+  content: '';
+  inline-size: 18px;
+  inset-block-end: -9px;
+  inset-inline-start: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.tooltipLabel {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.tooltipTime {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 400;
+  line-height: 1.25;
+  margin-block-start: 2px;
+}
+
+.controlRow {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.primaryControls,
+.secondaryControls {
+  align-items: center;
+  display: flex;
+}
+
+.primaryControls {
+  gap: 4px;
+}
+
+.secondaryControls {
+  gap: 4px;
+}
+
+.iconButton,
+.menuBackButton {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: var(--cvp-control);
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.iconButton {
+  block-size: 38px;
+  inline-size: 38px;
+}
+
+.menuBackButton {
+  block-size: 34px;
+  inline-size: 34px;
+}
+
+.iconButton svg,
+.menuBackButton svg {
+  block-size: 28px;
+  inline-size: 28px;
+}
+
+.fullscreenIcon {
+  block-size: 30px !important;
+  inline-size: 30px !important;
+}
+
+.iconButton:hover,
+.menuBackButton:hover,
+.settingsRow:hover,
+.menuOption:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.iconButton[data-active] {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.iconButton:active,
+.menuBackButton:active,
+.settingsRow:active,
+.menuOption:active {
+  transform: translateY(1px);
+}
+
+.iconButton:focus-visible,
+.timeline:focus-visible,
+.retryButton:focus-visible,
+.settingsRow:focus-visible,
+.menuBackButton:focus-visible,
+.menuOption:focus-visible,
+.volumeSlider:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.96);
+  outline-offset: 2px;
+}
+
+.volumeCluster {
+  align-items: center;
+  display: flex;
+  gap: 2px;
+}
+
+.volumeControl {
+  align-items: center;
+  display: flex;
+  inline-size: 48px;
+  opacity: 0.76;
+  overflow: hidden;
+  transition:
+    inline-size 180ms ease,
+    opacity 180ms ease;
+}
+
+.volumeCluster:hover .volumeControl,
+.volumeCluster:focus-within .volumeControl {
+  inline-size: 82px;
+  opacity: 1;
+}
+
+.volumeSlider {
+  --cvp-volume-percent: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: linear-gradient(
+    90deg,
+    #ffffff 0,
+    #ffffff var(--cvp-volume-percent),
+    rgba(255, 255, 255, 0.34) var(--cvp-volume-percent),
+    rgba(255, 255, 255, 0.34) 100%
+  );
+  block-size: 4px;
+  border-radius: 999px;
+  cursor: pointer;
+  inline-size: 74px;
+  margin: 0;
+}
+
+.volumeSlider::-webkit-slider-runnable-track {
+  background: transparent;
+  block-size: 4px;
+  border-radius: 999px;
+}
+
+.volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: #ffffff;
+  block-size: 12px;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(10, 10, 14, 0.3);
+  inline-size: 12px;
+  margin-top: -4px;
+}
+
+.volumeSlider::-moz-range-track {
+  background: transparent;
+  block-size: 4px;
+  border-radius: 999px;
+}
+
+.volumeSlider::-moz-range-thumb {
+  background: #ffffff;
+  block-size: 12px;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(10, 10, 14, 0.3);
+  inline-size: 12px;
+}
+
+.timecode {
+  align-items: baseline;
+  display: inline-flex;
+  font-size: 1.05rem;
+  gap: 8px;
+  letter-spacing: -0.02em;
+  margin-inline-start: 6px;
+}
+
+.timeDivider {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.loadingState,
+.errorState {
+  align-items: center;
+  backdrop-filter: blur(16px);
+  background: rgba(15, 16, 20, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  display: inline-flex;
+  gap: 10px;
+  inset-block-start: 18px;
+  inset-inline-start: 18px;
+  padding: 10px 14px;
+  position: absolute;
+  z-index: 3;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  block-size: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-inline-start-color: #ffffff;
+  border-radius: 999px;
+  inline-size: 14px;
+}
+
+.errorState {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-inline-size: min(320px, calc(100% - 36px));
+}
+
+.errorTitle {
+  margin: 0;
+}
+
+.retryButton {
+  appearance: none;
+  background: #ffffff;
+  border: 0;
+  border-radius: 999px;
+  color: #14151a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  padding: 9px 14px;
+}
+
+.menu {
+  background: var(--cvp-menu);
+  border: 1px solid var(--cvp-menu-border);
+  border-radius: 16px;
+  bottom: 58px;
+  box-shadow: 0 26px 48px rgba(9, 10, 14, 0.42);
+  inline-size: min(248px, calc(100vw - 40px));
+  padding: 10px;
+  position: absolute;
+  right: 10px;
+  z-index: 4;
+}
+
+.menuSection {
+  display: grid;
+  gap: 6px;
+}
+
+.menuSection + .menuSection {
+  margin-block-start: 8px;
+}
+
+.menuHeader {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto 1fr;
+  margin-block-end: 4px;
+}
+
+.menuTitle {
+  color: #ffffff;
+  font-size: 0.96rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.settingsRow,
+.menuOption {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  color: #ffffff;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.settingsRow {
+  gap: 10px;
+  grid-template-columns: 1fr auto auto;
+}
+
+.settingsRowContent {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
+}
+
+.settingsRowLabel {
+  color: #ffffff;
+  font-size: 0.96rem;
+}
+
+.settingsRowValue,
+.optionMeta {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.84rem;
+}
+
+.settingsRowArrow {
+  block-size: 18px;
+  color: rgba(255, 255, 255, 0.68);
+  inline-size: 18px;
+}
+
+.menuActionIcon {
+  block-size: 20px;
+  inline-size: 20px;
+}
+
+.optionList {
+  display: grid;
+  gap: 6px;
+}
+
+.menuOption {
+  background: rgba(255, 255, 255, 0.03);
+  grid-template-columns: 1fr auto;
+}
+
+.menuOption[data-active] {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .surface {
+    border-radius: 16px;
+  }
+
+  .controls {
+    padding: 0 14px 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .controls {
+    padding-inline: 12px;
+  }
+
+  .iconButton {
+    block-size: 34px;
+    inline-size: 34px;
+  }
+
+  .iconButton svg {
+    block-size: 24px;
+    inline-size: 24px;
+  }
+
+  .fullscreenIcon {
+    block-size: 26px !important;
+    inline-size: 26px !important;
+  }
+
+  .timecode {
+    font-size: 0.94rem;
+    gap: 6px;
+  }
+
+  .volumeCluster:focus-within .volumeControl,
+  .volumeCluster:hover .volumeControl {
+    inline-size: 66px;
+  }
+
+  .volumeSlider {
+    inline-size: 66px;
+  }
+
+  .tooltip {
+    min-inline-size: 154px;
+    padding: 10px 12px;
+  }
+
+  .menu {
+    inline-size: min(236px, calc(100vw - 24px));
+    right: 8px;
+  }
+}
+
+@media (pointer: coarse) {
+  .volumeControl {
+    inline-size: 68px;
+    opacity: 1;
+  }
+
+  .volumeSlider {
+    inline-size: 68px;
+  }
+}
