@@ -98,14 +98,14 @@ export function FullscreenIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
       <g fill="currentColor">
-        <rect x="7" y="7" width="3" height="6" />
-        <rect x="7" y="7" width="6" height="3" />
-        <rect x="7" y="18" width="3" height="6" />
-        <rect x="7" y="21" width="6" height="3" />
-        <rect x="18" y="7" width="6" height="3" />
-        <rect x="21" y="7" width="3" height="6" />
-        <rect x="18" y="21" width="6" height="3" />
-        <rect x="21" y="18" width="3" height="6" />
+        <rect x="8" y="8" width="3" height="5" />
+        <rect x="8" y="8" width="5" height="3" />
+        <rect x="8" y="18" width="3" height="5" />
+        <rect x="8" y="20" width="5" height="3" />
+        <rect x="18" y="8" width="5" height="3" />
+        <rect x="20" y="8" width="3" height="5" />
+        <rect x="18" y="20" width="5" height="3" />
+        <rect x="20" y="18" width="3" height="5" />
       </g>
     </svg>
   );
@@ -115,14 +115,14 @@ export function ExitFullscreenIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
       <g fill="currentColor">
-        <rect x="9" y="9" width="6" height="3" />
-        <rect x="9" y="9" width="3" height="6" />
-        <rect x="16" y="9" width="6" height="3" />
-        <rect x="19" y="9" width="3" height="6" />
-        <rect x="9" y="16" width="3" height="6" />
-        <rect x="9" y="19" width="6" height="3" />
-        <rect x="16" y="19" width="6" height="3" />
-        <rect x="19" y="16" width="3" height="6" />
+        <rect x="10" y="10" width="5" height="3" />
+        <rect x="10" y="10" width="3" height="5" />
+        <rect x="16" y="10" width="5" height="3" />
+        <rect x="18" y="10" width="3" height="5" />
+        <rect x="10" y="16" width="3" height="5" />
+        <rect x="10" y="18" width="5" height="3" />
+        <rect x="16" y="18" width="5" height="3" />
+        <rect x="18" y="16" width="3" height="5" />
       </g>
     </svg>
   );

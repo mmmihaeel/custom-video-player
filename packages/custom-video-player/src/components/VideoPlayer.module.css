@@ -248,9 +248,9 @@
 }
 
 .fullscreenIcon {
-  block-size: 28px !important;
+  block-size: 26px !important;
   display: block;
-  inline-size: 28px !important;
+  inline-size: 26px !important;
 }
 
 .iconButton:hover,
@@ -551,8 +551,8 @@
   }
 
   .fullscreenIcon {
-    block-size: 24px !important;
-    inline-size: 24px !important;
+    block-size: 22px !important;
+    inline-size: 22px !important;
   }
 
   .timecode {
