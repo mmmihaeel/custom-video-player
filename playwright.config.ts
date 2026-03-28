@@ -8,8 +8,9 @@ export default defineConfig({
   },
   webServer: {
     command:
-      'pnpm --filter demo build && pnpm --filter demo preview -- --host 127.0.0.1 --port 4173',
-    port: 4173,
-    reuseExistingServer: !process.env.CI
+      'pnpm --filter demo exec vite preview --host 127.0.0.1 --port 4173 --strictPort',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    url: 'http://127.0.0.1:4173'
   }
 });
