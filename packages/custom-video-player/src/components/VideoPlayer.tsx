@@ -231,6 +231,7 @@ export function VideoPlayer({
     <section
       ref={rootRef}
       className={rootClassName}
+      data-fullscreen={player.isFullscreen ? '' : undefined}
       style={rootStyle}
       tabIndex={0}
       onKeyDown={player.handleRootKeyDown}

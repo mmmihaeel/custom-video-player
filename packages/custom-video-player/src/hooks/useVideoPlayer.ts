@@ -167,6 +167,7 @@ export function useVideoPlayer({
   const [volume, setVolumeState] = useState(clamp(defaultVolume, 0, 1));
   const { isFullscreen, toggleFullscreen } = useFullscreen(
     rootRef,
+    videoRef,
     onFullscreenChange
   );
   const {

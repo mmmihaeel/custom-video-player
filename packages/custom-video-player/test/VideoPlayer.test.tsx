@@ -73,6 +73,32 @@ describe('VideoPlayer', () => {
     expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
   });
 
+  it('enters and exits fullscreen from the viewport control', async () => {
+    const user = userEvent.setup();
+    const { container } = renderPlayer();
+    const playerRoot = container.querySelector(
+      'section[aria-label="Video player"]'
+    );
+
+    if (!playerRoot) {
+      throw new Error('Player root was not rendered.');
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Enter fullscreen' }));
+
+    expect(playerRoot).toHaveAttribute('data-fullscreen');
+    expect(
+      screen.getByRole('button', { name: 'Exit fullscreen' })
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Exit fullscreen' }));
+
+    expect(playerRoot).not.toHaveAttribute('data-fullscreen');
+    expect(
+      screen.getByRole('button', { name: 'Enter fullscreen' })
+    ).toBeInTheDocument();
+  });
+
   it('emits a normalized state snapshot for host integrations', async () => {
     const onStateChange = vi.fn();
 

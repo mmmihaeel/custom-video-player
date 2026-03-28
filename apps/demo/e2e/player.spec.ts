@@ -105,6 +105,26 @@ test('volume slider reveals on hover and can reach true zero', async ({
   await expect(volume).toHaveAttribute('aria-valuenow', '0');
 });
 
+test('fullscreen can be entered and exited from the player control', async ({
+  page
+}) => {
+  await page.goto('/');
+
+  const fullscreenButton = page.getByRole('button', {
+    name: 'Enter fullscreen'
+  });
+
+  await fullscreenButton.click();
+  await expect(
+    page.getByRole('button', { name: 'Exit fullscreen' })
+  ).toBeVisible();
+
+  await page.getByRole('button', { name: 'Exit fullscreen' }).click();
+  await expect(
+    page.getByRole('button', { name: 'Enter fullscreen' })
+  ).toBeVisible();
+});
+
 test.describe('mobile interactions', () => {
   test.use({
     hasTouch: true,
@@ -171,5 +191,80 @@ test.describe('mobile interactions', () => {
     await expect(
       page.getByRole('button', { name: 'Picture in picture' })
     ).toBeVisible();
+  });
+
+  test('fullscreen fills the mobile viewport and exits cleanly', async ({
+    page
+  }) => {
+    await page.goto('/');
+
+    await page.getByRole('button', { name: 'Enter fullscreen' }).click();
+
+    await expect
+      .poll(async () =>
+        page.evaluate(() => {
+          const root = document.querySelector(
+            'section[aria-label="Video player"]'
+          );
+
+          return document.fullscreenElement === root;
+        })
+      )
+      .toBe(true);
+
+    const fullscreenMetrics = await page.evaluate(() => {
+      const root = document.querySelector(
+        'section[aria-label="Video player"]'
+      ) as HTMLElement | null;
+      const surface = root?.querySelector(
+        '[data-fullscreen]'
+      ) as HTMLElement | null;
+      const video = root?.querySelector('video');
+      const exitButton = Array.from(
+        root?.querySelectorAll('button') ?? []
+      ).find(
+        (button) => button.getAttribute('aria-label') === 'Exit fullscreen'
+      ) as HTMLElement | undefined;
+
+      return {
+        rootHeight: root?.getBoundingClientRect().height ?? 0,
+        rootWidth: root?.getBoundingClientRect().width ?? 0,
+        surfaceHeight: surface?.getBoundingClientRect().height ?? 0,
+        surfaceWidth: surface?.getBoundingClientRect().width ?? 0,
+        exitRight: exitButton?.getBoundingClientRect().right ?? 0,
+        surfaceRight: surface?.getBoundingClientRect().right ?? 0,
+        videoObjectFit: video ? getComputedStyle(video).objectFit : null,
+        viewportHeight: window.innerHeight,
+        viewportWidth: window.innerWidth
+      };
+    });
+
+    expect(Math.round(fullscreenMetrics.rootWidth)).toBe(
+      fullscreenMetrics.viewportWidth
+    );
+    expect(Math.round(fullscreenMetrics.surfaceWidth)).toBe(
+      fullscreenMetrics.viewportWidth
+    );
+    expect(Math.round(fullscreenMetrics.rootHeight)).toBe(
+      fullscreenMetrics.viewportHeight
+    );
+    expect(Math.round(fullscreenMetrics.surfaceHeight)).toBe(
+      fullscreenMetrics.viewportHeight
+    );
+    expect(fullscreenMetrics.surfaceRight).toBeLessThanOrEqual(
+      fullscreenMetrics.viewportWidth + 1
+    );
+    expect(fullscreenMetrics.exitRight).toBeLessThanOrEqual(
+      fullscreenMetrics.viewportWidth + 1
+    );
+    expect(fullscreenMetrics.videoObjectFit).toBe('contain');
+
+    await page.getByRole('button', { name: 'Exit fullscreen' }).click();
+
+    await expect
+      .poll(async () =>
+        page.evaluate(() => document.fullscreenElement === null)
+      )
+      .toBe(true);
   });
 });

@@ -12,6 +12,12 @@
   inline-size: 100%;
 }
 
+.root[data-fullscreen] {
+  background: #000000;
+  block-size: 100dvh;
+  inline-size: 100vw;
+}
+
 .surface {
   aspect-ratio: 16 / 9;
   background: var(--cvp-surface);
@@ -23,8 +29,29 @@
 }
 
 .surface[data-fullscreen] {
-  block-size: 100%;
+  aspect-ratio: unset;
   border-radius: 0;
+  block-size: 100dvh;
+  box-shadow: none;
+  inline-size: 100vw;
+  max-block-size: 100dvh;
+  max-inline-size: 100vw;
+}
+
+.surface[data-fullscreen] .video {
+  background: #000000;
+  object-fit: contain;
+}
+
+.surface[data-fullscreen] .controls {
+  padding: 0 max(14px, env(safe-area-inset-right, 0px))
+    calc(14px + env(safe-area-inset-bottom, 0px))
+    max(14px, env(safe-area-inset-left, 0px));
+}
+
+.surface[data-fullscreen] .menu {
+  bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  right: max(10px, env(safe-area-inset-right, 0px));
 }
 
 .video {
