@@ -9,6 +9,7 @@ export type {
   VideoPlayerReadyPayload,
   VideoPlayerState,
   VideoPlayerSettingsState,
+  VideoPlayerTheme,
   VideoQualityOption,
   VideoQualityValue,
   VideoSource

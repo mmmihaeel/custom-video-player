@@ -88,6 +88,11 @@ const PROP_ROWS = [
   ['playbackRates', 'number[]', 'Visible speed options in the settings menu.'],
   ['seekStep', 'number', 'Keyboard seek increment in seconds.'],
   [
+    'theme',
+    'Partial<VideoPlayerTheme>',
+    'Quick color-token overrides for the packaged UI.'
+  ],
+  [
     'labels',
     'Partial<VideoPlayerLabels>',
     'Visible copy and ARIA label overrides.'
@@ -260,7 +265,7 @@ export function App() {
   );
   const usageSnippet = useMemo(
     () =>
-      `import '@mmmihaeel/custom-video-player/styles.css';\nimport { VideoPlayer } from '${PACKAGE_NAME}';\n\nconst source = {\n  type: 'hls' as const,\n  src: '${demoVideo.hlsPlaylistUrl}'\n};\n\nconst chapters = ${JSON.stringify(demoVideo.chapters.slice(0, 2), null, 2)};\n\nexport function Example() {\n  return (\n    <VideoPlayer\n      source={source}\n      durationHint={${demoVideo.videoLength}}\n      chapters={chapters}\n      poster="/poster.png"\n      defaultQuality="auto"\n      defaultVolume={0.72}\n      playbackRates={[0.75, 1, 1.25, 1.5, 2]}\n    />\n  );\n}`,
+      `import '@mmmihaeel/custom-video-player/styles.css';\nimport { VideoPlayer } from '${PACKAGE_NAME}';\n\nconst source = {\n  type: 'hls' as const,\n  src: '${demoVideo.hlsPlaylistUrl}'\n};\n\nconst chapters = ${JSON.stringify(demoVideo.chapters.slice(0, 2), null, 2)};\n\nexport function Example() {\n  return (\n    <VideoPlayer\n      source={source}\n      durationHint={${demoVideo.videoLength}}\n      chapters={chapters}\n      poster="/poster.png"\n      defaultQuality="auto"\n      defaultVolume={0.72}\n      playbackRates={[0.75, 1, 1.25, 1.5, 2]}\n      theme={{\n        controlColor: '#f8f6f1',\n        railColor: 'rgba(248, 246, 241, 0.28)',\n        menuBackground: 'rgba(17, 20, 27, 0.96)'\n      }}\n    />\n  );\n}`,
     []
   );
   const playerKey = [
@@ -539,7 +544,10 @@ export function App() {
             <p className={styles.helperNote}>
               Import <code>{PACKAGE_NAME}/styles.css</code> once in the host app
               to ship the bundled control styling, then layer project-specific
-              layout or theming around the component as needed.
+              layout or theming around the component as needed. Use the{' '}
+              <code>theme</code> prop for token-level overrides and{' '}
+              <code>className</code>/<code>style</code> when the host app needs
+              deeper composition control.
             </p>
           </article>
           <article className={styles.panel}>

@@ -83,6 +83,17 @@ export interface VideoPlayerLabels {
   autoQuality: string;
 }
 
+export interface VideoPlayerTheme {
+  bufferedColor: string;
+  chapterMarkerColor: string;
+  controlColor: string;
+  menuBackground: string;
+  menuBorderColor: string;
+  railColor: string;
+  shadowColor: string;
+  surfaceBackground: string;
+}
+
 export interface VideoPlayerProps {
   source: VideoSource;
   chapters?: readonly VideoChapter[];
@@ -99,6 +110,7 @@ export interface VideoPlayerProps {
   seekStep?: number;
   className?: string;
   style?: CSSProperties;
+  theme?: Partial<VideoPlayerTheme>;
   labels?: Partial<VideoPlayerLabels>;
   onPlay?: () => void;
   onPause?: () => void;

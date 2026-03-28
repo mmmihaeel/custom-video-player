@@ -2,6 +2,7 @@ import { useId, useMemo, useRef, type CSSProperties } from 'react';
 import type {
   VideoPlayerLabels,
   VideoPlayerProps,
+  VideoPlayerTheme,
   VideoQualityValue
 } from '../types/player';
 import { useHls } from '../hooks/useHls';
@@ -22,6 +23,8 @@ import {
   VolumeMutedIcon
 } from './icons';
 import styles from './VideoPlayer.module.css';
+
+type RootStyle = CSSProperties & Partial<Record<`--cvp-${string}`, string>>;
 
 const DEFAULT_LABELS: VideoPlayerLabels = {
   autoQuality: 'Auto',
@@ -60,6 +63,50 @@ function resolveQualityLabel(
   return `${selectedQuality}p`;
 }
 
+function buildThemeStyle(
+  theme: Partial<VideoPlayerTheme> | undefined
+): RootStyle | undefined {
+  if (!theme) {
+    return undefined;
+  }
+
+  const themeStyle: RootStyle = {};
+
+  if (theme.controlColor) {
+    themeStyle['--cvp-control'] = theme.controlColor;
+  }
+
+  if (theme.menuBackground) {
+    themeStyle['--cvp-menu'] = theme.menuBackground;
+  }
+
+  if (theme.menuBorderColor) {
+    themeStyle['--cvp-menu-border'] = theme.menuBorderColor;
+  }
+
+  if (theme.railColor) {
+    themeStyle['--cvp-rail'] = theme.railColor;
+  }
+
+  if (theme.bufferedColor) {
+    themeStyle['--cvp-buffered'] = theme.bufferedColor;
+  }
+
+  if (theme.chapterMarkerColor) {
+    themeStyle['--cvp-segment'] = theme.chapterMarkerColor;
+  }
+
+  if (theme.shadowColor) {
+    themeStyle['--cvp-shadow'] = theme.shadowColor;
+  }
+
+  if (theme.surfaceBackground) {
+    themeStyle['--cvp-surface'] = theme.surfaceBackground;
+  }
+
+  return themeStyle;
+}
+
 export function VideoPlayer({
   autoPlay = false,
   chapters = [],
@@ -96,6 +143,7 @@ export function VideoPlayer({
   preload = 'metadata',
   seekStep = 5,
   source,
+  theme,
   style
 }: VideoPlayerProps) {
   const normalizedChapters = useMemo(
@@ -165,6 +213,13 @@ export function VideoPlayer({
   });
 
   const rootClassName = [styles.root, className].filter(Boolean).join(' ');
+  const rootStyle = useMemo<RootStyle>(
+    () => ({
+      ...buildThemeStyle(theme),
+      ...style
+    }),
+    [style, theme]
+  );
   const includeHours = player.resolvedDuration >= 3600;
   const selectedQualityLabel = resolveQualityLabel(
     player.selectedQuality,
@@ -176,7 +231,7 @@ export function VideoPlayer({
     <section
       ref={rootRef}
       className={rootClassName}
-      style={style}
+      style={rootStyle}
       tabIndex={0}
       onKeyDown={player.handleRootKeyDown}
       aria-label="Video player"

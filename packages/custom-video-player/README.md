@@ -1,6 +1,6 @@
 # @mmmihaeel/custom-video-player
 
-`@mmmihaeel/custom-video-player` is a reusable React component for HLS playback with custom controls, chapter-aware timeline behavior, inline volume control, fullscreen, Picture-in-Picture, and callback-driven host integration.
+`@mmmihaeel/custom-video-player` is a reusable React component for HLS playback with custom controls, chapter-aware timeline behavior, quality switching, fullscreen, Picture-in-Picture, and callback-driven host integration.
 
 ## Installation
 
@@ -48,12 +48,17 @@ export function Example() {
       defaultPlaybackRate={1}
       defaultVolume={0.72}
       playbackRates={[0.75, 1, 1.25, 1.5, 2]}
+      theme={{
+        controlColor: '#f8f6f1',
+        railColor: 'rgba(248, 246, 241, 0.28)',
+        menuBackground: 'rgba(17, 20, 27, 0.96)'
+      }}
     />
   );
 }
 ```
 
-## Styling
+## Styling And Theming
 
 Import the bundled stylesheet once in the host application:
 
@@ -61,17 +66,48 @@ Import the bundled stylesheet once in the host application:
 import '@mmmihaeel/custom-video-player/styles.css';
 ```
 
-Use `className`, `style`, or wrapper layout styles when you need to adapt the player to a page or design system.
+Use `theme` for quick token-level overrides and `className` / `style` when the host app needs deeper layout or visual composition control.
+
+```tsx
+<VideoPlayer
+  source={source}
+  theme={{
+    controlColor: '#f5f1e8',
+    surfaceBackground: '#0d1016',
+    menuBackground: 'rgba(13, 16, 22, 0.96)',
+    menuBorderColor: 'rgba(245, 241, 232, 0.12)',
+    railColor: 'rgba(245, 241, 232, 0.24)',
+    bufferedColor: 'rgba(245, 241, 232, 0.18)',
+    chapterMarkerColor: 'rgba(198, 209, 236, 0.55)',
+    shadowColor: '0 26px 52px rgba(6, 7, 10, 0.42)'
+  }}
+/>
+```
+
+Supported theme keys:
+
+| Key                  | Maps To             | Purpose                                           |
+| -------------------- | ------------------- | ------------------------------------------------- |
+| `controlColor`       | `--cvp-control`     | Icon, text, progress, and thumb color             |
+| `surfaceBackground`  | `--cvp-surface`     | Video surface background behind the media element |
+| `menuBackground`     | `--cvp-menu`        | Settings menu background                          |
+| `menuBorderColor`    | `--cvp-menu-border` | Settings menu border                              |
+| `railColor`          | `--cvp-rail`        | Timeline and volume rail color                    |
+| `bufferedColor`      | `--cvp-buffered`    | Buffered timeline fill                            |
+| `chapterMarkerColor` | `--cvp-segment`     | Chapter segment color                             |
+| `shadowColor`        | `--cvp-shadow`      | Player surface shadow                             |
+
+`style` is applied after `theme`, so direct CSS variable overrides in `style` win when both are provided.
 
 ## Feature Summary
 
-| Area          | Included                                                               |
-| ------------- | ---------------------------------------------------------------------- |
-| Playback UI   | Play/pause, mute, inline volume slider, fullscreen, and PiP            |
-| Streaming     | Native HLS when available, lazy `hls.js` fallback otherwise            |
-| Timeline      | Chapter markers, hover tooltip, click-to-seek, keyboard seeking        |
-| Settings      | Manual quality selection and playback-rate menu                        |
-| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks |
+| Area          | Included                                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| Playback UI   | Play/pause, replay overlay, desktop volume rail, compact mobile mute-first control, fullscreen, and PiP |
+| Streaming     | `hls.js`-driven manual quality selection with native fallback when required                             |
+| Timeline      | Chapter markers, hover tooltip, click-to-seek, keyboard seeking                                         |
+| Settings      | Manual quality selection and playback-rate menu                                                         |
+| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks                                  |
 
 ## Props
 
@@ -92,6 +128,7 @@ Use `className`, `style`, or wrapper layout styles when you need to adapt the pl
 | `seekStep`            | `number`                         | `5`                       | Keyboard seek interval in seconds               |
 | `className`           | `string`                         | `undefined`               | Custom root class name                          |
 | `style`               | `CSSProperties`                  | `undefined`               | Inline root styles                              |
+| `theme`               | `Partial<VideoPlayerTheme>`      | `undefined`               | Quick token-level color and surface overrides   |
 | `labels`              | `Partial<VideoPlayerLabels>`     | `undefined`               | UI copy and ARIA label overrides                |
 
 ## Callback Events
@@ -125,7 +162,7 @@ Use `className`, `style`, or wrapper layout styles when you need to adapt the pl
 
 | Group               | Keys                                                                       |
 | ------------------- | -------------------------------------------------------------------------- |
-| Playback            | `play`, `pause`, `mute`, `unmute`, `volume`                                |
+| Playback            | `play`, `pause`, `replay`, `mute`, `unmute`, `volume`                      |
 | Settings            | `settings`, `quality`, `playbackSpeed`, `autoQuality`, `back`              |
 | Viewport            | `fullscreen`, `exitFullscreen`, `pictureInPicture`, `exitPictureInPicture` |
 | Timeline and status | `timeline`, `loading`, `retry`, `streamError`                              |
@@ -148,3 +185,4 @@ Use `className`, `style`, or wrapper layout styles when you need to adapt the pl
 - The timeline is implemented with semantic `div`-based controls instead of a native range input.
 - `hls.js` is lazy-loaded so consumers do not pay for the runtime until it is required.
 - Pointer events drive seeking behavior on desktop and touch devices alike.
+- Compact mobile layouts keep the visible control row focused on playback-first actions, while secondary viewport actions move into the settings sheet.

@@ -123,4 +123,22 @@ describe('VideoPlayer', () => {
 
     expect(screen.getByRole('button', { name: 'Replay' })).toBeInTheDocument();
   });
+
+  it('maps the theme prop to stable CSS variables on the root element', () => {
+    const { container } = renderPlayer({
+      theme: {
+        controlColor: '#f5f1e8',
+        railColor: 'rgba(245, 241, 232, 0.24)',
+        surfaceBackground: '#0d1016'
+      }
+    });
+
+    const root = container.querySelector('section[aria-label="Video player"]');
+
+    expect(root).toHaveStyle({
+      '--cvp-control': '#f5f1e8',
+      '--cvp-rail': 'rgba(245, 241, 232, 0.24)',
+      '--cvp-surface': '#0d1016'
+    });
+  });
 });

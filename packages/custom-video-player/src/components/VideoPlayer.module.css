@@ -6,6 +6,7 @@
   --cvp-buffered: rgba(255, 255, 255, 0.2);
   --cvp-segment: rgba(151, 163, 194, 0.6);
   --cvp-shadow: 0 24px 50px rgba(12, 12, 15, 0.32);
+  --cvp-surface: #101114;
   color: var(--cvp-control);
   display: block;
   inline-size: 100%;
@@ -13,7 +14,7 @@
 
 .surface {
   aspect-ratio: 16 / 9;
-  background: #101114;
+  background: var(--cvp-surface);
   border-radius: 18px;
   box-shadow: var(--cvp-shadow);
   isolation: isolate;
@@ -73,7 +74,7 @@
   backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  color: #ffffff;
+  color: var(--cvp-control);
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
@@ -157,7 +158,7 @@
 }
 
 .chapterSegment::after {
-  background: rgba(255, 255, 255, 0.72);
+  background: color-mix(in srgb, var(--cvp-control) 72%, transparent);
   block-size: 13px;
   border-radius: 999px;
   content: '';
@@ -169,7 +170,7 @@
 }
 
 .timelineProgress {
-  background: #ffffff;
+  background: var(--cvp-control);
   inset-inline-start: 0;
 }
 
@@ -181,7 +182,7 @@
 }
 
 .timelineThumb {
-  background: #ffffff;
+  background: var(--cvp-control);
   block-size: 18px;
   border-radius: 999px;
   box-shadow:
@@ -191,7 +192,7 @@
 }
 
 .timelinePreview {
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb, var(--cvp-control) 82%, transparent);
   block-size: 14px;
   border-radius: 999px;
   inline-size: 2px;
@@ -414,12 +415,12 @@
 }
 
 .volumeProgress {
-  background: #ffffff;
+  background: var(--cvp-control);
   inset-inline-start: 0;
 }
 
 .volumeThumb {
-  background: #ffffff;
+  background: var(--cvp-control);
   block-size: 18px;
   border-radius: 999px;
   box-shadow:
@@ -477,7 +478,7 @@
   animation: spin 1s linear infinite;
   block-size: 14px;
   border: 2px solid rgba(255, 255, 255, 0.22);
-  border-inline-start-color: #ffffff;
+  border-inline-start-color: var(--cvp-control);
   border-radius: 999px;
   inline-size: 14px;
 }
@@ -541,7 +542,7 @@
 }
 
 .menuTitle {
-  color: #ffffff;
+  color: var(--cvp-control);
   font-size: 0.96rem;
   font-weight: 500;
   margin: 0;
@@ -554,7 +555,7 @@
   background: transparent;
   border: 0;
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--cvp-control);
   cursor: pointer;
   display: grid;
   font: inherit;
@@ -576,7 +577,7 @@
 }
 
 .settingsRowLabel {
-  color: #ffffff;
+  color: var(--cvp-control);
   font-size: 0.96rem;
 }
 
@@ -631,13 +632,13 @@
   }
 
   .centerActionButton {
-    block-size: 70px;
-    inline-size: 70px;
+    block-size: 66px;
+    inline-size: 66px;
   }
 
   .centerActionIcon {
-    block-size: 30px !important;
-    inline-size: 30px !important;
+    block-size: 28px !important;
+    inline-size: 28px !important;
   }
 }
 
@@ -693,13 +694,13 @@
   }
 
   .centerActionButton {
-    block-size: 58px;
-    inline-size: 58px;
+    block-size: 52px;
+    inline-size: 52px;
   }
 
   .centerActionIcon {
-    block-size: 24px !important;
-    inline-size: 24px !important;
+    block-size: 22px !important;
+    inline-size: 22px !important;
   }
 
   .controls {

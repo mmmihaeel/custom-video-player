@@ -58,24 +58,26 @@ export function Example() {
 
 ## Package Highlights
 
-| Area          | Included                                                               |
-| ------------- | ---------------------------------------------------------------------- |
-| Playback      | Play/pause, mute, inline volume, fullscreen, and Picture-in-Picture    |
-| Streaming     | Native HLS when available, lazy `hls.js` fallback otherwise            |
-| Timeline      | Chapters, hover tooltip, click-to-seek, and keyboard seeking           |
-| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks |
-| Delivery      | TypeScript, tests, GitHub Actions, and a live demo                     |
+| Area          | Included                                                                                      |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Playback      | Play/pause, replay overlay, mute, adaptive audio controls, fullscreen, and Picture-in-Picture |
+| Streaming     | Native HLS when available, lazy `hls.js` fallback otherwise                                   |
+| Timeline      | Chapters, hover tooltip, click-to-seek, and keyboard seeking                                  |
+| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks                        |
+| Delivery      | TypeScript, tests, GitHub Actions, and a live demo                                            |
 
 ## Using The Package
 
 - Package usage and API: [packages/custom-video-player/README.md](packages/custom-video-player/README.md)
 - Public API notes: [docs/api-design.md](docs/api-design.md)
 
-## Maintainer Notes
+## Repository Docs
 
 - Package internals: [docs/architecture.md](docs/architecture.md)
 - Testing strategy: [docs/testing-strategy.md](docs/testing-strategy.md)
 - Demo deployment: [docs/demo-deployment.md](docs/demo-deployment.md)
+
+## Local Development
 
 ```bash
 pnpm install

@@ -17,7 +17,7 @@ The package keeps the public surface deliberately small. It focuses on normalize
 | Media input        | `source`, `poster`, `durationHint`, `preload`                                                                                                                                   |
 | Timeline model     | `chapters`, `seekStep`                                                                                                                                                          |
 | Playback defaults  | `autoPlay`, `muted`, `loop`, `defaultVolume`, `defaultQuality`, `defaultPlaybackRate`, `playbackRates`                                                                          |
-| Presentation hooks | `className`, `style`, `labels`                                                                                                                                                  |
+| Presentation hooks | `className`, `style`, `theme`, `labels`                                                                                                                                         |
 | Lifecycle hooks    | play, pause, end, seek, time, metadata, buffering, state, waiting, settings, quality, playback rate, volume, mute, chapter, fullscreen, picture-in-picture, and error callbacks |
 
 ## Why The Package Does Not Fetch Data
@@ -33,7 +33,8 @@ Keeping fetching and upstream mapping outside the package avoids three common pr
 - `defaultQuality="auto"` preserves adaptive HLS behavior.
 - Numeric quality values are interpreted as video heights.
 - If the requested height is not present in the manifest, the player falls back to adaptive mode.
-- Browsers with native HLS support still render correctly, but may expose fewer manual quality options because level metadata is browser-managed.
+- The player prefers `hls.js` when level metadata is available so manual quality selection stays consistent across modern browsers.
+- Browsers that cannot run `hls.js` still fall back to native HLS playback.
 
 ## Settings Menu Model
 
@@ -42,7 +43,7 @@ The settings UI follows a compact, layered model:
 - Root menu exposes quality and playback speed.
 - Nested views keep option lists focused and readable.
 - The selected item is echoed back in the root menu to reduce guesswork.
-- Picture-in-picture stays on the main control row because it behaves like a viewport mode, not a playback preference.
+- Picture-in-picture is exposed as a viewport action on larger layouts and moves into the settings sheet on compact layouts to keep the primary control row focused.
 
 ## Accessibility Notes
 
