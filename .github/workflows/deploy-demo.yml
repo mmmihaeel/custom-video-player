@@ -50,14 +50,13 @@ jobs:
 
       - name: Package Pages artifact
         run: |
-          tar --dereference --hard-dereference -cf github-pages.tar -C apps/demo/dist .
-          gzip -f github-pages.tar
+          tar --dereference --hard-dereference -cf artifact.tar -C apps/demo/dist .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
           name: github-pages
-          path: github-pages.tar.gz
+          path: artifact.tar
           if-no-files-found: error
           retention-days: 1
 
