@@ -64,6 +64,7 @@ export interface VideoPlayerState {
 export interface VideoPlayerLabels {
   play: string;
   pause: string;
+  replay: string;
   mute: string;
   unmute: string;
   back: string;

@@ -16,6 +16,7 @@ import {
   PauseIcon,
   PictureInPictureIcon,
   PlayIcon,
+  ReplayIcon,
   SettingsIcon,
   VolumeIcon,
   VolumeMutedIcon
@@ -35,6 +36,7 @@ const DEFAULT_LABELS: VideoPlayerLabels = {
   play: 'Play',
   playbackSpeed: 'Playback speed',
   quality: 'Quality',
+  replay: 'Replay',
   retry: 'Retry',
   settings: 'Playback settings',
   streamError: 'We could not load this stream.',
@@ -207,6 +209,30 @@ export function VideoPlayer({
           </div>
         ) : null}
 
+        {!player.error && !player.isWaiting && player.hasStartedPlayback ? (
+          <div className={styles.centerActionLayer}>
+            {player.isEnded ? (
+              <button
+                type="button"
+                className={styles.centerActionButton}
+                onClick={player.replay}
+                aria-label={resolvedLabels.replay}
+              >
+                <ReplayIcon className={styles.centerActionIcon} />
+              </button>
+            ) : !player.isPlaying ? (
+              <button
+                type="button"
+                className={styles.centerActionButton}
+                onClick={player.togglePlayback}
+                aria-label={resolvedLabels.play}
+              >
+                <PlayIcon className={styles.centerActionIcon} />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
         <div className={styles.controls}>
           <div className={styles.timelineGroup}>
             {player.timelinePreview ? (
@@ -306,23 +332,40 @@ export function VideoPlayer({
                 </button>
 
                 <div className={styles.volumeControl}>
-                  <input
+                  <div
+                    ref={player.volumeRef}
                     className={styles.volumeSlider}
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={player.volume}
+                    role="slider"
+                    tabIndex={0}
                     aria-label={resolvedLabels.volume}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(player.volume * 100)}
+                    aria-valuetext={`${Math.round(player.volume * 100)}%`}
+                    data-zero={player.volume === 0 ? '' : undefined}
                     style={
                       {
                         '--cvp-volume-percent': `${Math.round(player.volume * 100)}%`
                       } as CSSProperties
                     }
-                    onChange={(event) =>
-                      player.setVolume(Number(event.currentTarget.value))
-                    }
-                  />
+                    onKeyDown={player.handleVolumeKeyDown}
+                    onPointerDown={player.handleVolumePointerDown}
+                    onPointerMove={player.handleVolumePointerMove}
+                    onPointerUp={player.handleVolumePointerUp}
+                    onPointerCancel={player.handleVolumePointerUp}
+                  >
+                    <div className={styles.volumeRail} aria-hidden="true" />
+                    <div
+                      className={styles.volumeProgress}
+                      style={{ width: `${player.volume * 100}%` }}
+                      aria-hidden="true"
+                    />
+                    <div
+                      className={styles.volumeThumb}
+                      style={{ left: `${player.volume * 100}%` }}
+                      aria-hidden="true"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -339,7 +382,7 @@ export function VideoPlayer({
               {player.isPictureInPictureSupported ? (
                 <button
                   type="button"
-                  className={styles.iconButton}
+                  className={`${styles.iconButton} ${styles.secondaryActionButton}`}
                   data-active={player.isPictureInPicture ? '' : undefined}
                   onClick={() =>
                     void player.togglePictureInPicture().catch(() => undefined)
@@ -358,7 +401,7 @@ export function VideoPlayer({
               <button
                 ref={player.settingsButtonRef}
                 type="button"
-                className={styles.iconButton}
+                className={`${styles.iconButton} ${styles.settingsButton}`}
                 aria-label={resolvedLabels.settings}
                 aria-haspopup="dialog"
                 aria-controls={settingsMenuId}
@@ -391,125 +434,160 @@ export function VideoPlayer({
           </div>
 
           {player.isMenuOpen ? (
-            <div
-              ref={player.menuRef}
-              id={settingsMenuId}
-              className={styles.menu}
-              role="dialog"
-              aria-label={resolvedLabels.settings}
-            >
-              {player.menuView === 'root' ? (
-                <div className={styles.menuSection}>
-                  <button
-                    type="button"
-                    className={styles.settingsRow}
-                    onClick={() => player.setMenuView('quality')}
-                  >
-                    <span className={styles.settingsRowLabel}>
-                      {resolvedLabels.quality}
-                    </span>
-                    <span className={styles.settingsRowValue}>
-                      {selectedQualityLabel}
-                    </span>
-                    <ChevronRightIcon className={styles.settingsRowArrow} />
-                  </button>
-
-                  <button
-                    type="button"
-                    className={styles.settingsRow}
-                    onClick={() => player.setMenuView('speed')}
-                  >
-                    <span className={styles.settingsRowLabel}>
-                      {resolvedLabels.playbackSpeed}
-                    </span>
-                    <span className={styles.settingsRowValue}>
-                      {currentPlaybackRateLabel}
-                    </span>
-                    <ChevronRightIcon className={styles.settingsRowArrow} />
-                  </button>
-                </div>
+            <>
+              {player.isCompactLayout ? (
+                <div
+                  className={styles.menuBackdrop}
+                  onClick={() => player.setIsMenuOpen(false)}
+                  aria-hidden="true"
+                />
               ) : null}
 
-              {player.menuView === 'quality' ? (
-                <div className={styles.menuSection}>
-                  <div className={styles.menuHeader}>
+              <div
+                ref={player.menuRef}
+                id={settingsMenuId}
+                className={styles.menu}
+                role="dialog"
+                aria-label={resolvedLabels.settings}
+              >
+                {player.menuView === 'root' ? (
+                  <div className={styles.menuSection}>
                     <button
                       type="button"
-                      className={styles.menuBackButton}
-                      onClick={() => player.setMenuView('root')}
-                      aria-label={resolvedLabels.back}
+                      className={styles.settingsRow}
+                      onClick={() => player.setMenuView('quality')}
                     >
-                      <ChevronLeftIcon />
+                      <span className={styles.settingsRowLabel}>
+                        {resolvedLabels.quality}
+                      </span>
+                      <span className={styles.settingsRowValue}>
+                        {selectedQualityLabel}
+                      </span>
+                      <ChevronRightIcon className={styles.settingsRowArrow} />
                     </button>
-                    <p className={styles.menuTitle}>{resolvedLabels.quality}</p>
-                  </div>
 
-                  <div className={styles.optionList}>
-                    {player.qualityOptions.map((qualityOption) => (
-                      <button
-                        key={qualityOption.value}
-                        type="button"
-                        className={styles.menuOption}
-                        data-active={
-                          player.selectedQuality === qualityOption.value
-                            ? ''
-                            : undefined
-                        }
-                        onClick={() => {
-                          player.setQuality(qualityOption.value);
-                          player.setIsMenuOpen(false);
-                        }}
-                      >
-                        <span>{qualityOption.label}</span>
-                        {player.selectedQuality === qualityOption.value ? (
-                          <span className={styles.optionMeta}>Current</span>
-                        ) : null}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {player.menuView === 'speed' ? (
-                <div className={styles.menuSection}>
-                  <div className={styles.menuHeader}>
                     <button
                       type="button"
-                      className={styles.menuBackButton}
-                      onClick={() => player.setMenuView('root')}
-                      aria-label={resolvedLabels.back}
+                      className={styles.settingsRow}
+                      onClick={() => player.setMenuView('speed')}
                     >
-                      <ChevronLeftIcon />
+                      <span className={styles.settingsRowLabel}>
+                        {resolvedLabels.playbackSpeed}
+                      </span>
+                      <span className={styles.settingsRowValue}>
+                        {currentPlaybackRateLabel}
+                      </span>
+                      <ChevronRightIcon className={styles.settingsRowArrow} />
                     </button>
-                    <p className={styles.menuTitle}>
-                      {resolvedLabels.playbackSpeed}
-                    </p>
-                  </div>
 
-                  <div className={styles.optionList}>
-                    {player.playbackRateOptions.map((rate) => (
-                      <button
-                        key={rate}
-                        type="button"
-                        className={styles.menuOption}
-                        data-active={
-                          player.playbackRate === rate ? '' : undefined
-                        }
-                        onClick={() => {
-                          player.setPlaybackRate(rate);
-                          player.setIsMenuOpen(false);
-                        }}
-                      >
-                        <span>{formatPlaybackRate(rate)}</span>
-                        {player.playbackRate === rate ? (
-                          <span className={styles.optionMeta}>Current</span>
-                        ) : null}
-                      </button>
-                    ))}
+                    <div className={styles.compactMenuActions}>
+                      {player.isPictureInPictureSupported ? (
+                        <button
+                          type="button"
+                          className={styles.menuOption}
+                          data-active={
+                            player.isPictureInPicture ? '' : undefined
+                          }
+                          onClick={() => {
+                            void player
+                              .togglePictureInPicture()
+                              .catch(() => undefined);
+                            player.setIsMenuOpen(false);
+                          }}
+                        >
+                          <span>{resolvedLabels.pictureInPicture}</span>
+                          {player.isPictureInPicture ? (
+                            <span className={styles.optionMeta}>Active</span>
+                          ) : null}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
-              ) : null}
-            </div>
+                ) : null}
+
+                {player.menuView === 'quality' ? (
+                  <div className={styles.menuSection}>
+                    <div className={styles.menuHeader}>
+                      <button
+                        type="button"
+                        className={styles.menuBackButton}
+                        onClick={() => player.setMenuView('root')}
+                        aria-label={resolvedLabels.back}
+                      >
+                        <ChevronLeftIcon />
+                      </button>
+                      <p className={styles.menuTitle}>
+                        {resolvedLabels.quality}
+                      </p>
+                    </div>
+
+                    <div className={styles.optionList}>
+                      {player.qualityOptions.map((qualityOption) => (
+                        <button
+                          key={qualityOption.value}
+                          type="button"
+                          className={styles.menuOption}
+                          data-active={
+                            player.selectedQuality === qualityOption.value
+                              ? ''
+                              : undefined
+                          }
+                          onClick={() => {
+                            player.setQuality(qualityOption.value);
+                            player.setIsMenuOpen(false);
+                          }}
+                        >
+                          <span>{qualityOption.label}</span>
+                          {player.selectedQuality === qualityOption.value ? (
+                            <span className={styles.optionMeta}>Current</span>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {player.menuView === 'speed' ? (
+                  <div className={styles.menuSection}>
+                    <div className={styles.menuHeader}>
+                      <button
+                        type="button"
+                        className={styles.menuBackButton}
+                        onClick={() => player.setMenuView('root')}
+                        aria-label={resolvedLabels.back}
+                      >
+                        <ChevronLeftIcon />
+                      </button>
+                      <p className={styles.menuTitle}>
+                        {resolvedLabels.playbackSpeed}
+                      </p>
+                    </div>
+
+                    <div className={styles.optionList}>
+                      {player.playbackRateOptions.map((rate) => (
+                        <button
+                          key={rate}
+                          type="button"
+                          className={styles.menuOption}
+                          data-active={
+                            player.playbackRate === rate ? '' : undefined
+                          }
+                          onClick={() => {
+                            player.setPlaybackRate(rate);
+                            player.setIsMenuOpen(false);
+                          }}
+                        >
+                          <span>{formatPlaybackRate(rate)}</span>
+                          {player.playbackRate === rate ? (
+                            <span className={styles.optionMeta}>Current</span>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </>
           ) : null}
         </div>
       </div>

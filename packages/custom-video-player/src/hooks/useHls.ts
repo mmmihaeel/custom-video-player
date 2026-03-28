@@ -145,12 +145,6 @@ export function useHls({
       video.load();
     };
 
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = source.src;
-      video.load();
-      return cleanup;
-    }
-
     void import('hls.js')
       .then(({ default: HlsRuntime }) => {
         if (cancelled) {
@@ -158,6 +152,12 @@ export function useHls({
         }
 
         if (!HlsRuntime.isSupported()) {
+          if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = source.src;
+            video.load();
+            return;
+          }
+
           emitError(new Error('This browser does not support HLS playback.'));
           return;
         }

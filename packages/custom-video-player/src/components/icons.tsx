@@ -43,6 +43,27 @@ export function PauseIcon(props: IconProps) {
   );
 }
 
+export function ReplayIcon(props: IconProps) {
+  return (
+    <svg {...baseProps} {...props} aria-hidden="true">
+      <path
+        d="M23.6 11.2a9.2 9.2 0 1 0 1 7.7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.4"
+      />
+      <path
+        d="m21.9 6.7 0.1 6.1-6.1-0.1"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.4"
+      />
+    </svg>
+  );
+}
+
 export function VolumeIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
@@ -97,16 +118,54 @@ export function SettingsIcon(props: IconProps) {
 export function FullscreenIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
-      <g fill="currentColor">
-        <rect x="8" y="8" width="3" height="5" />
-        <rect x="8" y="8" width="5" height="3" />
-        <rect x="8" y="18" width="3" height="5" />
-        <rect x="8" y="20" width="5" height="3" />
-        <rect x="18" y="8" width="5" height="3" />
-        <rect x="20" y="8" width="3" height="5" />
-        <rect x="18" y="20" width="5" height="3" />
-        <rect x="20" y="18" width="3" height="5" />
-      </g>
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="translate(6 6.5)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="translate(6 9.67676) rotate(-90)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="matrix(1 0 0 -1 6 24.5)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="matrix(-4.37114e-08 1 1 4.37114e-08 6 21.3232)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="translate(24 6.5) rotate(90)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="translate(20.8242 6.5)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 24 24.5)"
+        fill="currentColor"
+      />
+      <rect
+        width="3.17647"
+        height="6.35294"
+        transform="matrix(1 0 0 -1 20.8242 24.5)"
+        fill="currentColor"
+      />
     </svg>
   );
 }

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -92,5 +92,35 @@ describe('VideoPlayer', () => {
         volume: 1
       })
     );
+  });
+
+  it('keeps the poster clean before playback and shows replay after ending', async () => {
+    const { container } = renderPlayer();
+    const video = container.querySelector('video');
+
+    if (!video) {
+      throw new Error('Video element was not rendered.');
+    }
+
+    expect(
+      container.querySelector('button[class*="centerActionButton"]')
+    ).toBeNull();
+
+    fireEvent.play(video);
+    fireEvent.pause(video);
+
+    expect(
+      container.querySelector('button[class*="centerActionButton"]')
+    ).toBeInTheDocument();
+    expect(
+      container
+        .querySelector('button[class*="centerActionButton"]')
+        ?.getAttribute('aria-label')
+    ).toBe('Play');
+
+    fireEvent.play(video);
+    fireEvent.ended(video);
+
+    expect(screen.getByRole('button', { name: 'Replay' })).toBeInTheDocument();
   });
 });

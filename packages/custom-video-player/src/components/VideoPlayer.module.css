@@ -57,6 +57,56 @@
   z-index: 3;
 }
 
+.centerActionLayer {
+  display: grid;
+  inset: 0;
+  place-items: center;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.centerActionButton {
+  align-items: center;
+  appearance: none;
+  background: rgba(16, 17, 20, 0.62);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  pointer-events: auto;
+  block-size: 78px;
+  inline-size: 78px;
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease;
+}
+
+.centerActionButton:hover {
+  background: rgba(16, 17, 20, 0.72);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.centerActionButton:active {
+  transform: scale(0.97);
+}
+
+.centerActionButton:focus-visible {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.82),
+    0 0 0 4px rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+
+.centerActionIcon {
+  block-size: 34px !important;
+  inline-size: 34px !important;
+}
+
 .timelineGroup {
   margin-block-end: 10px;
   position: relative;
@@ -203,6 +253,7 @@
 .secondaryControls {
   align-items: center;
   display: flex;
+  min-inline-size: 0;
 }
 
 .primaryControls {
@@ -248,9 +299,10 @@
 }
 
 .fullscreenIcon {
-  block-size: 26px !important;
+  block-size: 24px !important;
   display: block;
-  inline-size: 26px !important;
+  flex-shrink: 0;
+  inline-size: 24px !important;
 }
 
 .iconButton:hover,
@@ -272,97 +324,133 @@
 }
 
 .iconButton:focus-visible,
-.timeline:focus-visible,
 .retryButton:focus-visible,
 .settingsRow:focus-visible,
 .menuBackButton:focus-visible,
-.menuOption:focus-visible,
+.menuOption:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.82),
+    0 0 0 4px rgba(255, 255, 255, 0.14);
+  outline: none;
+}
+
+.timeline:focus-visible,
 .volumeSlider:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.96);
-  outline-offset: 2px;
+  outline: none;
+}
+
+.timeline:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
+}
+
+.volumeSlider:focus-visible {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.62);
+  border-radius: 999px;
 }
 
 .volumeCluster {
   align-items: center;
   display: flex;
-  gap: 2px;
+  gap: 4px;
+  position: relative;
 }
 
 .volumeControl {
   align-items: center;
   display: flex;
-  inline-size: 48px;
-  opacity: 0.76;
+  background: rgba(15, 16, 20, 0.8);
+  block-size: 34px;
+  border-radius: 999px;
+  inline-size: 0;
   overflow: hidden;
+  opacity: 0;
+  padding-inline: 0;
+  pointer-events: none;
+  transform: translateX(-6px);
   transition:
     inline-size 180ms ease,
-    opacity 180ms ease;
+    opacity 180ms ease,
+    padding-inline 180ms ease,
+    transform 180ms ease;
 }
 
 .volumeCluster:hover .volumeControl,
 .volumeCluster:focus-within .volumeControl {
-  inline-size: 82px;
+  inline-size: 96px;
   opacity: 1;
+  padding-inline: 12px;
+  pointer-events: auto;
+  transform: translateX(0);
 }
 
 .volumeSlider {
   --cvp-volume-percent: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  background: linear-gradient(
-    90deg,
-    #ffffff 0,
-    #ffffff var(--cvp-volume-percent),
-    rgba(255, 255, 255, 0.34) var(--cvp-volume-percent),
-    rgba(255, 255, 255, 0.34) 100%
-  );
-  block-size: 4px;
+  block-size: 24px;
+  inline-size: 100%;
+  outline: none;
+  position: relative;
+  touch-action: none;
+}
+
+.volumeRail,
+.volumeProgress,
+.volumeThumb {
+  inset-block-start: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+.volumeRail,
+.volumeProgress {
+  block-size: 3px;
   border-radius: 999px;
+}
+
+.volumeRail {
+  background: var(--cvp-rail);
+  inset-inline: 0;
+}
+
+.volumeProgress {
+  background: #ffffff;
+  inset-inline-start: 0;
+}
+
+.volumeThumb {
+  background: #ffffff;
+  block-size: 18px;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.18),
+    0 10px 18px rgba(10, 10, 14, 0.28);
   cursor: pointer;
-  inline-size: 74px;
-  margin: 0;
+  inline-size: 4px;
+  transition:
+    inline-size 140ms ease,
+    opacity 140ms ease;
 }
 
-.volumeSlider::-webkit-slider-runnable-track {
-  background: transparent;
-  block-size: 4px;
-  border-radius: 999px;
+.volumeSlider[data-zero] .volumeThumb {
+  opacity: 0;
 }
 
-.volumeSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  background: #ffffff;
-  block-size: 12px;
-  border: 0;
-  border-radius: 999px;
-  box-shadow: 0 2px 10px rgba(10, 10, 14, 0.3);
-  inline-size: 12px;
-  margin-top: -4px;
-}
-
-.volumeSlider::-moz-range-track {
-  background: transparent;
-  block-size: 4px;
-  border-radius: 999px;
-}
-
-.volumeSlider::-moz-range-thumb {
-  background: #ffffff;
-  block-size: 12px;
-  border: 0;
-  border-radius: 999px;
-  box-shadow: 0 2px 10px rgba(10, 10, 14, 0.3);
-  inline-size: 12px;
+.volumeSlider:hover .volumeThumb,
+.volumeSlider:focus-visible .volumeThumb {
+  inline-size: 5px;
+  opacity: 1;
 }
 
 .timecode {
   align-items: baseline;
   display: inline-flex;
   font-size: 1.05rem;
+  flex-shrink: 1;
   gap: 8px;
   letter-spacing: -0.02em;
   margin-inline-start: 6px;
+  white-space: nowrap;
 }
 
 .timeDivider {
@@ -429,6 +517,10 @@
   position: absolute;
   right: 10px;
   z-index: 4;
+}
+
+.menuBackdrop {
+  display: none;
 }
 
 .menuSection {
@@ -510,6 +602,10 @@
   gap: 6px;
 }
 
+.compactMenuActions {
+  display: none;
+}
+
 .menuOption {
   background: rgba(255, 255, 255, 0.03);
   grid-template-columns: 1fr auto;
@@ -533,6 +629,16 @@
   .controls {
     padding: 0 14px 14px;
   }
+
+  .centerActionButton {
+    block-size: 70px;
+    inline-size: 70px;
+  }
+
+  .centerActionIcon {
+    block-size: 30px !important;
+    inline-size: 30px !important;
+  }
 }
 
 @media (max-width: 640px) {
@@ -551,8 +657,8 @@
   }
 
   .fullscreenIcon {
-    block-size: 22px !important;
-    inline-size: 22px !important;
+    block-size: 21px !important;
+    inline-size: 21px !important;
   }
 
   .timecode {
@@ -562,11 +668,11 @@
 
   .volumeCluster:focus-within .volumeControl,
   .volumeCluster:hover .volumeControl {
-    inline-size: 66px;
+    inline-size: 84px;
   }
 
   .volumeSlider {
-    inline-size: 66px;
+    inline-size: 100%;
   }
 
   .tooltip {
@@ -580,13 +686,200 @@
   }
 }
 
-@media (pointer: coarse) {
+@media (max-width: 480px) {
+  .surface {
+    border-radius: 12px;
+    box-shadow: 0 14px 28px rgba(12, 12, 15, 0.22);
+  }
+
+  .centerActionButton {
+    block-size: 58px;
+    inline-size: 58px;
+  }
+
+  .centerActionIcon {
+    block-size: 24px !important;
+    inline-size: 24px !important;
+  }
+
+  .controls {
+    padding: 0 8px 8px;
+  }
+
+  .timelineGroup {
+    margin-block-end: 6px;
+  }
+
+  .timeline {
+    block-size: 18px;
+  }
+
+  .timelineRail,
+  .timelineBuffered,
+  .timelineProgress,
+  .chapterSegment {
+    block-size: 2px;
+  }
+
+  .chapterSegment::after {
+    block-size: 8px;
+    inline-size: 1.5px;
+  }
+
+  .timelineThumb {
+    block-size: 12px;
+    inline-size: 3px;
+  }
+
+  .timeline:hover .timelineThumb,
+  .timeline:focus-visible .timelineThumb {
+    inline-size: 4px;
+  }
+
+  .controlRow {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+    justify-content: space-between;
+  }
+
+  .primaryControls,
+  .secondaryControls {
+    inline-size: auto;
+  }
+
+  .primaryControls {
+    flex: 1;
+    justify-content: flex-start;
+    gap: 1px;
+  }
+
+  .secondaryControls {
+    gap: 1px;
+    justify-content: flex-end;
+    min-inline-size: 30px;
+  }
+
+  .secondaryActionButton {
+    display: none;
+  }
+
+  .settingsButton {
+    margin-inline-start: auto;
+  }
+
+  .iconButton {
+    block-size: 32px;
+    border-radius: 7px;
+    inline-size: 32px;
+  }
+
+  .iconButton svg {
+    block-size: 17px;
+    inline-size: 17px;
+  }
+
+  .fullscreenIcon {
+    block-size: 16px !important;
+    inline-size: 16px !important;
+  }
+
+  .volumeCluster {
+    gap: 0;
+  }
+
   .volumeControl {
-    inline-size: 68px;
+    display: none;
+  }
+
+  .timecode {
+    flex: 1;
+    font-size: 0.74rem;
+    gap: 3px;
+    justify-content: flex-start;
+    letter-spacing: -0.01em;
+    margin-inline-start: 0;
+  }
+
+  .compactMenuActions {
+    display: grid;
+    gap: 4px;
+    margin-block-start: 4px;
+  }
+
+  .menuBackdrop {
+    background: rgba(9, 10, 14, 0.22);
+    display: block;
+    inset: 0;
+    position: fixed;
+    z-index: 4;
+  }
+
+  .menu {
+    border-radius: 18px;
+    bottom: 8px;
+    inline-size: auto;
+    inset-inline: 8px;
+    max-block-size: min(48vh, 280px);
+    overflow-y: auto;
+    padding: 10px 10px calc(12px + env(safe-area-inset-bottom, 0px));
+    position: fixed;
+    z-index: 5;
+  }
+
+  .menuSection {
+    gap: 6px;
+  }
+
+  .settingsRow,
+  .menuOption {
+    min-block-size: 42px;
+    padding: 8px 10px;
+  }
+
+  .menuTitle {
+    font-size: 0.9rem;
+  }
+
+  .settingsRowLabel {
+    font-size: 0.9rem;
+  }
+
+  .settingsRowValue,
+  .optionMeta {
+    font-size: 0.78rem;
+  }
+
+  .settingsRowArrow {
+    block-size: 16px;
+    inline-size: 16px;
+  }
+
+  .tooltip {
+    display: none;
+  }
+}
+
+@media (pointer: coarse) and (min-width: 481px) {
+  .iconButton:focus-visible,
+  .retryButton:focus-visible,
+  .settingsRow:focus-visible,
+  .menuBackButton:focus-visible,
+  .menuOption:focus-visible,
+  .timeline:focus-visible,
+  .volumeSlider:focus-visible {
+    box-shadow: none;
+  }
+
+  .volumeControl {
+    inline-size: 84px;
     opacity: 1;
+    padding-inline: 12px;
+    pointer-events: auto;
+    transform: translateX(0);
   }
 
   .volumeSlider {
-    inline-size: 68px;
+    inline-size: 100%;
   }
 }

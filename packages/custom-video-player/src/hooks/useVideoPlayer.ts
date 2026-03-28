@@ -142,6 +142,7 @@ export function useVideoPlayer({
 }: UseVideoPlayerOptions) {
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const volumeRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastAudibleVolumeRef = useRef(clamp(defaultVolume, 0, 1) || 1);
@@ -150,7 +151,10 @@ export function useVideoPlayer({
   const [bufferedEnd, setBufferedEnd] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(durationHint ?? 0);
+  const [hasStartedPlayback, setHasStartedPlayback] = useState(autoPlay);
+  const [isEnded, setIsEnded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCompactLayout, setIsCompactLayout] = useState(false);
   const [isMuted, setIsMuted] = useState(muted || defaultVolume <= 0);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [menuView, setMenuView] = useState<VideoPlayerMenuView>('root');
@@ -327,6 +331,23 @@ export function useVideoPlayer({
     syncFromVideo();
   });
 
+  const setVolumeFromClientX = useEffectEvent((clientX: number) => {
+    const slider = volumeRef.current;
+
+    if (!slider) {
+      return;
+    }
+
+    const rect = slider.getBoundingClientRect();
+
+    if (rect.width <= 0) {
+      return;
+    }
+
+    const progress = clamp((clientX - rect.left) / rect.width, 0, 1);
+    setVolume(progress);
+  });
+
   const toggleMute = useEffectEvent(() => {
     const video = videoRef.current;
 
@@ -414,8 +435,47 @@ export function useVideoPlayer({
 
   const retry = useEffectEvent(() => {
     setMediaError(null);
+    setIsEnded(false);
     retryStream();
   });
+
+  const replay = useEffectEvent(() => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    setMediaError(null);
+    setIsEnded(false);
+    video.currentTime = 0;
+    setCurrentTime(0);
+
+    void video.play().catch(() => {
+      const playbackError = new Error('Playback could not be started.');
+      setMediaError(playbackError);
+      onError?.(playbackError);
+    });
+  });
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') {
+      setIsCompactLayout(false);
+      return;
+    }
+
+    const mediaQuery = window.matchMedia('(max-width: 480px)');
+    const syncLayout = () => {
+      setIsCompactLayout(mediaQuery.matches);
+    };
+
+    syncLayout();
+    mediaQuery.addEventListener('change', syncLayout);
+
+    return () => {
+      mediaQuery.removeEventListener('change', syncLayout);
+    };
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -443,6 +503,8 @@ export function useVideoPlayer({
     }
 
     const handlePlay = () => {
+      setHasStartedPlayback(true);
+      setIsEnded(false);
       setIsPlaying(true);
       setIsWaiting(false);
       onPlay?.();
@@ -454,6 +516,8 @@ export function useVideoPlayer({
     };
 
     const handleEnded = () => {
+      setHasStartedPlayback(true);
+      setIsEnded(true);
       setIsPlaying(false);
       onPause?.();
       onEnded?.();
@@ -659,17 +723,16 @@ export function useVideoPlayer({
     const handlePointerDown = (event: globalThis.PointerEvent) => {
       const menu = menuRef.current;
       const button = settingsButtonRef.current;
+      const target = event.target as Node;
 
       if (
-        !isMenuOpen ||
-        (menu && menu.contains(event.target as Node)) ||
-        (button && button.contains(event.target as Node))
+        isMenuOpen &&
+        (!menu || !menu.contains(target)) &&
+        (!button || !button.contains(target))
       ) {
-        return;
+        setIsMenuOpen(false);
+        setMenuView('root');
       }
-
-      setIsMenuOpen(false);
-      setMenuView('root');
     };
 
     const handleEscape = (event: globalThis.KeyboardEvent) => {
@@ -737,25 +800,85 @@ export function useVideoPlayer({
 
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
+      event.stopPropagation();
       seekTo(currentTime - seekStep);
       return;
     }
 
     if (event.key === 'ArrowRight') {
       event.preventDefault();
+      event.stopPropagation();
       seekTo(currentTime + seekStep);
       return;
     }
 
     if (event.key === 'Home') {
       event.preventDefault();
+      event.stopPropagation();
       seekTo(0);
       return;
     }
 
     if (event.key === 'End') {
       event.preventDefault();
+      event.stopPropagation();
       seekTo(resolvedDuration);
+    }
+  };
+
+  const handleVolumePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.currentTarget.focus();
+    setVolumeFromClientX(event.clientX);
+  };
+
+  const handleVolumePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+      return;
+    }
+
+    setVolumeFromClientX(event.clientX);
+  };
+
+  const handleVolumePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    setVolumeFromClientX(event.clientX);
+  };
+
+  const handleVolumeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      event.stopPropagation();
+      setVolume(volume - 0.05);
+      return;
+    }
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      event.stopPropagation();
+      setVolume(volume + 0.05);
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      event.stopPropagation();
+      setVolume(0);
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      event.stopPropagation();
+      setVolume(1);
     }
   };
 
@@ -834,6 +957,13 @@ export function useVideoPlayer({
     handleTimelinePointerDown,
     handleTimelinePointerMove,
     handleTimelinePointerUp,
+    hasStartedPlayback,
+    isCompactLayout,
+    isEnded,
+    handleVolumeKeyDown,
+    handleVolumePointerDown,
+    handleVolumePointerMove,
+    handleVolumePointerUp,
     handleVideoClick,
     handleVideoDoubleClick,
     isFullscreen,
@@ -860,6 +990,7 @@ export function useVideoPlayer({
     progressPercent,
     qualityOptions,
     resolvedDuration,
+    replay,
     retry,
     selectedQuality,
     setIsMenuOpen,
@@ -876,6 +1007,7 @@ export function useVideoPlayer({
     togglePlayback,
     toggleSettingsMenu,
     tooltipRef,
+    volumeRef,
     volume,
     clearPreview
   };
