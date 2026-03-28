@@ -1,48 +1,20 @@
 .page {
   min-height: 100vh;
-  padding: 46px 20px 84px;
+  padding: 44px 18px 84px;
 }
 
 .shell {
   display: grid;
-  gap: 28px;
+  gap: 40px;
   margin: 0 auto;
-  max-width: 1280px;
+  max-width: 980px;
 }
 
 .hero,
-.stage,
-.twoColumn {
-  display: grid;
-  gap: 22px;
-}
-
-.hero {
-  align-items: start;
-  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 380px);
-}
-
-.heroCopy,
-.commandCard,
-.playerCard,
-.eventCard,
-.playgroundCard,
-.panel {
-  animation: rise 620ms ease both;
-  backdrop-filter: blur(18px);
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  box-shadow: 0 24px 56px rgba(20, 25, 40, 0.08);
-  border-radius: 30px;
-  min-width: 0;
-  padding: 24px;
-}
-
-.heroCopy,
-.commandCard,
-.previewColumn,
-.playgroundCard,
-.docsSection {
+.section,
+.installCard,
+.panel,
+.playgroundCard {
   display: grid;
   gap: 20px;
 }
@@ -58,20 +30,21 @@
 }
 
 .title {
-  color: #131825;
-  font-size: clamp(3rem, 6vw, 5.5rem);
+  color: #151b2a;
+  font-size: clamp(3rem, 7vw, 5.4rem);
   letter-spacing: -0.06em;
   line-height: 0.92;
   margin: 0;
-  max-width: 11ch;
+  max-width: 10ch;
 }
 
 .lead,
 .helperNote,
 .errorNote,
-.infoList {
+.infoList,
+.featureCard p {
   color: #55617b;
-  line-height: 1.68;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -80,13 +53,73 @@
   max-width: 60ch;
 }
 
+.sectionIntro {
+  color: #55617b;
+  line-height: 1.72;
+  margin: -6px 0 0;
+  max-width: 62ch;
+}
+
+.badgeRow,
 .heroActions,
-.actionRow {
+.actionRow,
+.toggleRow,
+.installTabs {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
 }
 
+.badgeRow span {
+  background: rgba(20, 26, 40, 0.05);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 999px;
+  color: #25304a;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+  padding: 10px 14px;
+}
+
+.installCard,
+.panel,
+.playerCard,
+.playgroundCard {
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  box-shadow: 0 24px 56px rgba(20, 25, 40, 0.08);
+  min-width: 0;
+  padding: 28px;
+}
+
+.playerCard {
+  gap: 0;
+}
+
+.cardHeader {
+  display: grid;
+  gap: 8px;
+}
+
+.cardTitle,
+.panelTitle,
+.formTitle {
+  color: #151b2a;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+
+.cardTitle {
+  font-size: 1.48rem;
+}
+
+.panelTitle,
+.formTitle {
+  font-size: 1.16rem;
+}
+
+.installTab,
 .primaryAction,
 .secondaryAction,
 .primaryButton,
@@ -97,10 +130,7 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
-  font-weight: 500;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 18px;
   text-decoration: none;
   transition:
     transform 150ms ease,
@@ -108,11 +138,27 @@
     border-color 150ms ease;
 }
 
+.installTab {
+  background: rgba(20, 26, 40, 0.04);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  color: #42506b;
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.installTab[data-active] {
+  background: #151a25;
+  border-color: #151a25;
+  color: #ffffff;
+}
+
 .primaryAction,
 .primaryButton {
   background: #151a25;
   border: 1px solid #151a25;
   color: #ffffff;
+  min-height: 48px;
+  padding: 0 18px;
 }
 
 .secondaryAction,
@@ -120,13 +166,15 @@
   background: rgba(255, 255, 255, 0.86);
   border: 1px solid rgba(20, 26, 40, 0.1);
   color: #1b2234;
+  min-height: 48px;
+  padding: 0 18px;
 }
 
 .primaryAction:hover,
 .secondaryAction:hover,
 .primaryButton:hover,
 .secondaryButton:hover,
-.presetButton:hover {
+.installTab:hover {
   transform: translateY(-1px);
 }
 
@@ -135,118 +183,41 @@
   opacity: 0.7;
 }
 
-.presetButton:focus-visible {
-  border-color: rgba(21, 26, 37, 0.2);
-  outline: 2px solid rgba(21, 26, 37, 0.12);
-  outline-offset: 1px;
-}
-
-.badgeRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.badgeRow span {
-  background: rgba(20, 26, 40, 0.06);
-  border: 1px solid rgba(20, 26, 40, 0.08);
-  border-radius: 999px;
-  color: #25304a;
-  font-size: 0.92rem;
-  overflow-wrap: anywhere;
-  padding: 10px 14px;
-}
-
-.cardHeader {
-  display: grid;
-  gap: 8px;
-}
-
-.cardTitle {
-  color: #151b2a;
-  font-size: 1.35rem;
-  letter-spacing: -0.03em;
-  margin: 0;
-}
-
-.commandList {
-  display: grid;
-  gap: 12px;
-}
-
-.commandItem {
-  background: #171b25;
-  border-radius: 18px;
-  color: #f3f6fd;
-  display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-}
-
-.commandItem span {
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 0.82rem;
-  text-transform: uppercase;
-}
-
-.commandItem code,
 .codeBlock {
+  background: #161b25;
+  border-radius: 20px;
+  color: #f4f7ff;
   font-family: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
-  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  margin: 0;
+  overflow-x: auto;
+  padding: 16px 18px;
+  white-space: pre-wrap;
 }
 
-.metricGrid {
+.featureGrid,
+.stateGrid {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.metricCard {
+.featureCard,
+.stateCard {
   background: rgba(20, 26, 40, 0.03);
   border: 1px solid rgba(20, 26, 40, 0.06);
   border-radius: 20px;
   display: grid;
   gap: 6px;
   min-height: 104px;
-  padding: 18px;
+  padding: 16px 18px;
 }
 
-.metricLabel {
-  color: #6f7992;
-  font-size: 0.82rem;
-}
-
-.stage {
-  align-items: start;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 380px);
-}
-
-.previewColumn {
-  display: grid;
-  gap: 18px;
-}
-
-.eventList,
-.infoList {
-  display: grid;
-  gap: 10px;
-  padding-left: 20px;
-}
-
-.stateGrid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.stateCard {
-  background: rgba(20, 26, 40, 0.03);
-  border: 1px solid rgba(20, 26, 40, 0.06);
-  border-radius: 18px;
-  display: grid;
-  gap: 6px;
-  min-height: 88px;
-  padding: 14px;
+.featureCard strong,
+.stateCard strong {
+  color: #151b2a;
+  font-size: 1rem;
 }
 
 .stateCard span {
@@ -254,9 +225,11 @@
   font-size: 0.8rem;
 }
 
-.stateCard strong {
-  color: #151b2a;
-  font-size: 1rem;
+.eventList,
+.infoList {
+  display: grid;
+  gap: 12px;
+  padding-left: 20px;
 }
 
 .fieldGrid {
@@ -264,37 +237,11 @@
   gap: 14px;
 }
 
-.presetList {
+.formSection {
+  border-top: 1px solid rgba(20, 26, 40, 0.08);
   display: grid;
-  gap: 10px;
-}
-
-.presetButton {
-  appearance: none;
-  background: rgba(20, 26, 40, 0.03);
-  border: 1px solid rgba(20, 26, 40, 0.08);
-  border-radius: 18px;
-  color: #1d2435;
-  cursor: pointer;
-  display: grid;
-  font: inherit;
-  gap: 4px;
-  padding: 14px 16px;
-  text-align: left;
-  transition:
-    transform 150ms ease,
-    background-color 150ms ease,
-    border-color 150ms ease;
-}
-
-.presetButton strong {
-  font-size: 0.94rem;
-}
-
-.presetButton span {
-  color: #5f6b84;
-  font-size: 0.84rem;
-  line-height: 1.5;
+  gap: 14px;
+  padding-top: 18px;
 }
 
 .field {
@@ -324,7 +271,7 @@
 }
 
 .field textarea {
-  min-block-size: 220px;
+  min-block-size: 240px;
   resize: vertical;
 }
 
@@ -336,16 +283,16 @@
 
 .field input:focus,
 .field select:focus,
-.field textarea:focus {
+.field textarea:focus,
+.installTab:focus-visible,
+.primaryAction:focus-visible,
+.secondaryAction:focus-visible,
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.disclosureSummary:focus-visible {
   border-color: rgba(21, 26, 37, 0.2);
   outline: 2px solid rgba(21, 26, 37, 0.12);
   outline-offset: 1px;
-}
-
-.toggleRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
 .toggleRow label {
@@ -371,25 +318,6 @@
   padding: 12px 14px;
 }
 
-.docsSection {
-  display: grid;
-  gap: 22px;
-}
-
-.twoColumn {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.codeBlock {
-  background: #161b25;
-  border-radius: 20px;
-  color: #f4f7ff;
-  font-size: 0.9rem;
-  margin: 0;
-  overflow-x: auto;
-  padding: 16px 18px;
-}
-
 .tableWrap {
   overflow-x: auto;
 }
@@ -402,9 +330,19 @@
 .table th,
 .table td {
   border-bottom: 1px solid rgba(20, 26, 40, 0.08);
-  padding: 12px 0;
+  padding: 18px 12px;
   text-align: left;
   vertical-align: top;
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: 0;
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: 0;
 }
 
 .table th {
@@ -419,52 +357,65 @@
   color: #23304a;
 }
 
-.table code,
-.commandItem code {
+.table code {
   font-size: 0.88rem;
 }
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.disclosure {
+  background: rgba(20, 26, 40, 0.02);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 22px;
+  display: grid;
+  gap: 0;
+  overflow: hidden;
 }
 
-@media (max-width: 1120px) {
-  .hero,
-  .stage,
-  .twoColumn {
-    grid-template-columns: minmax(0, 1fr);
-  }
+.disclosureSummary {
+  color: #1d2435;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  padding: 18px 20px;
 }
 
-@media (max-width: 760px) {
+.disclosureSummary::-webkit-details-marker {
+  display: none;
+}
+
+.disclosureSummary::after {
+  color: #5f6b84;
+  content: '+';
+  float: right;
+  font-size: 1.1rem;
+}
+
+.disclosure[open] .disclosureSummary::after {
+  content: '-';
+}
+
+.disclosureBody {
+  border-top: 1px solid rgba(20, 26, 40, 0.08);
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+@media (max-width: 720px) {
   .page {
     padding: 26px 14px 48px;
   }
 
-  .heroCopy,
-  .commandCard,
+  .installCard,
+  .panel,
   .playerCard,
-  .eventCard,
-  .playgroundCard,
-  .panel {
+  .playgroundCard {
     border-radius: 24px;
-    padding: 18px;
+    padding: 20px;
   }
 
-  .metricGrid {
-    grid-template-columns: 1fr;
-  }
-
+  .featureGrid,
   .stateGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .heroActions,
@@ -481,15 +432,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heroCopy,
-  .commandCard,
-  .playerCard,
-  .eventCard,
-  .playgroundCard,
-  .panel {
-    animation: none;
-  }
-
+  .installTab,
   .primaryAction,
   .secondaryAction,
   .primaryButton,

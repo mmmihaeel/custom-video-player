@@ -1,6 +1,6 @@
-# Demo Deployment
+# Demo Deployment Notes
 
-The demo application is deployed to GitHub Pages from `apps/demo`.
+The demo application is deployed to GitHub Pages from `apps/demo` as the public package showcase.
 
 ## Deployment Requirements
 
@@ -12,13 +12,13 @@ The demo application is deployed to GitHub Pages from `apps/demo`.
 
 ## Workflow Summary
 
-| Step     | Action                                                            |
-| -------- | ----------------------------------------------------------------- |
-| Install  | Restore workspace dependencies with a frozen lockfile             |
-| Validate | Run formatting, linting, type checks, tests, and workspace builds |
-| Browser  | Run the Playwright smoke suite before publishing                  |
-| Upload   | Publish `apps/demo/dist` as the Pages artifact                    |
-| Deploy   | Use the official GitHub Pages actions to release the artifact     |
+| Step     | Action                                                             |
+| -------- | ------------------------------------------------------------------ |
+| Install  | Restore repository dependencies with a frozen lockfile             |
+| Validate | Run formatting, linting, type checks, tests, and production builds |
+| Browser  | Run the Playwright smoke suite before publishing                   |
+| Upload   | Publish `apps/demo/dist` as the Pages artifact                     |
+| Deploy   | Use the official GitHub Pages actions to release the artifact      |
 
 ## Local Verification
 

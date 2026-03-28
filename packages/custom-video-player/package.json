@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/mmmihaeel/custom-video-player/issues"
   },
-  "homepage": "https://github.com/mmmihaeel/custom-video-player/tree/main/packages/custom-video-player#readme",
+  "homepage": "https://mmmihaeel.github.io/custom-video-player/",
   "type": "module",
   "keywords": [
     "react",
@@ -36,7 +36,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./styles.css": "./dist/custom-video-player.css"
   },
   "scripts": {
     "build": "vite build",

@@ -1,17 +1,18 @@
 export const demoVideo = {
   chapters: [
-    { title: 'Player overview', start: 0, end: 80 },
+    { title: 'Introduction & Course Overview', start: 0, end: 14 },
     {
-      title: 'Control surface and transport actions',
-      start: 81,
-      end: 160
+      title: "Curiosity's Role in Critical & Creative Thinking",
+      start: 15,
+      end: 57
     },
-    { title: 'Timeline and chapter behavior', start: 161, end: 250 },
-    { title: 'Layered settings navigation', start: 251, end: 330 },
-    { title: 'Keyboard and touch interaction', start: 331, end: 415 },
-    { title: 'Host callbacks and telemetry hooks', start: 416, end: 510 },
-    { title: 'Packaging and integration wrap-up', start: 511, end: 596 }
+    { title: 'Analytical vs Creative Thinking Explained', start: 58, end: 116 },
+    { title: 'Building Your Bank of Dots', start: 117, end: 138 },
+    { title: 'Practical Strategies to Stay Curious', start: 139, end: 225 },
+    { title: 'Benefits of Curiosity', start: 226, end: 312 },
+    { title: 'Conclusion & Recap', start: 313, end: 348 }
   ],
-  hlsPlaylistUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-  videoLength: 596
+  hlsPlaylistUrl:
+    'https://vz-50e60d70-540.b-cdn.net/b87ac5f4-2cf0-42d1-acc8-32a89d3c71c7/playlist.m3u8',
+  videoLength: 348
 } as const;

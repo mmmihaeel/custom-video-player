@@ -8,6 +8,14 @@
 pnpm add @mmmihaeel/custom-video-player
 ```
 
+```bash
+npm install @mmmihaeel/custom-video-player
+```
+
+```bash
+yarn add @mmmihaeel/custom-video-player
+```
+
 Peer dependencies:
 
 - `react`
@@ -16,7 +24,13 @@ Peer dependencies:
 ## Quick Example
 
 ```tsx
+import '@mmmihaeel/custom-video-player/styles.css';
 import { VideoPlayer } from '@mmmihaeel/custom-video-player';
+
+const source = {
+  type: 'hls' as const,
+  src: 'https://example.com/playlist.m3u8'
+};
 
 const chapters = [
   { title: 'Introduction', start: 0, end: 14 },
@@ -26,7 +40,7 @@ const chapters = [
 export function Example() {
   return (
     <VideoPlayer
-      source={{ type: 'hls', src: 'https://example.com/playlist.m3u8' }}
+      source={source}
       durationHint={348}
       chapters={chapters}
       poster="/poster.png"
@@ -34,12 +48,20 @@ export function Example() {
       defaultPlaybackRate={1}
       defaultVolume={0.72}
       playbackRates={[0.75, 1, 1.25, 1.5, 2]}
-      onLoadedMetadata={(metadata) => console.log(metadata.duration)}
-      onSettingsChange={(settings) => console.log(settings)}
     />
   );
 }
 ```
+
+## Styling
+
+Import the bundled stylesheet once in the host application:
+
+```tsx
+import '@mmmihaeel/custom-video-player/styles.css';
+```
+
+Use `className`, `style`, or wrapper layout styles when you need to adapt the player to a page or design system.
 
 ## Feature Summary
 
@@ -84,7 +106,7 @@ export function Example() {
 | `onLoadedMetadata`         | `(metadata: VideoPlayerMetadata) => void`       | Duration, selected quality, qualities, and media element resolved |
 | `onReady`                  | `(metadata: VideoPlayerMetadata) => void`       | Alias for a ready-to-integrate metadata callback                  |
 | `onBufferedChange`         | `(payload: VideoPlayerBufferedPayload) => void` | Buffering state changed                                           |
-| `onStateChange`            | `(state: VideoPlayerState) => void`             | Normalized runtime snapshot for custom orchestration              |
+| `onStateChange`            | `(state: VideoPlayerState) => void`             | Normalized runtime snapshot for host orchestration                |
 | `onWaitingChange`          | `(isWaiting: boolean) => void`                  | Buffering state toggled                                           |
 | `onQualityChange`          | `(quality: VideoQualityValue) => void`          | Quality selection changed                                         |
 | `onPlaybackRateChange`     | `(rate: number) => void`                        | Playback speed changed                                            |

@@ -96,58 +96,9 @@ export function SettingsIcon(props: IconProps) {
 
 export function FullscreenIcon(props: IconProps) {
   return (
-    <svg
-      {...baseProps}
-      {...props}
-      aria-hidden="true"
-      shapeRendering="crispEdges"
-    >
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="translate(6 6.5)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="translate(6 9.67676) rotate(-90)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(1 0 0 -1 6 24.5)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(-4.37114e-08 1 1 4.37114e-08 6 21.3232)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="translate(24 6.5) rotate(90)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="translate(20.8242 6.5)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 24 24.5)"
-        fill="currentColor"
-      />
-      <rect
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(1 0 0 -1 20.8242 24.5)"
+    <svg {...baseProps} {...props} aria-hidden="true">
+      <path
+        d="M6 6.5h3.18v6.35H6V6.5Zm0 0h6.35v3.18H6V6.5Zm0 18h3.18v-6.35H6V24.5Zm0-3.18h6.35v3.18H6v-3.18Zm18-14.82v3.18h-6.35V6.5H24Zm-3.18 0H24v6.35h-3.18V6.5ZM24 24.5v-3.18h-6.35v3.18H24Zm-3.18 0H24v-6.35h-3.18V24.5Z"
         fill="currentColor"
       />
     </svg>
@@ -156,73 +107,9 @@ export function FullscreenIcon(props: IconProps) {
 
 export function ExitFullscreenIcon(props: IconProps) {
   return (
-    <svg
-      {...baseProps}
-      {...props}
-      aria-hidden="true"
-      shapeRendering="crispEdges"
-    >
-      <rect
-        x="6"
-        y="6.5"
-        width="3.17647"
-        height="6.35294"
-        transform="rotate(180 6 6.5)"
-        fill="currentColor"
-      />
-      <rect
-        x="9.17676"
-        y="6.5"
-        width="3.17647"
-        height="6.35294"
-        transform="rotate(90 9.17676 6.5)"
-        fill="currentColor"
-      />
-      <rect
-        x="24"
-        y="6.5"
-        width="3.17647"
-        height="6.35294"
-        transform="rotate(90 24 6.5)"
-        fill="currentColor"
-      />
-      <rect
-        x="20.8232"
-        y="9.67676"
-        width="3.17647"
-        height="6.35294"
-        transform="rotate(180 20.8232 9.67676)"
-        fill="currentColor"
-      />
-      <rect
-        x="6"
-        y="24.5"
-        width="3.17647"
-        height="6.35294"
-        fill="currentColor"
-      />
-      <rect
-        x="9.17676"
-        y="21.3232"
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(0 -1 -1 0 9.17676 21.3232)"
-        fill="currentColor"
-      />
-      <rect
-        x="24"
-        y="24.5"
-        width="3.17647"
-        height="6.35294"
-        transform="rotate(180 24 24.5)"
-        fill="currentColor"
-      />
-      <rect
-        x="20.8232"
-        y="21.3232"
-        width="3.17647"
-        height="6.35294"
-        transform="matrix(0 1 1 0 20.8232 21.3232)"
+    <svg {...baseProps} {...props} aria-hidden="true">
+      <path
+        d="M9 9.5h6.2v3.2H9V9.5Zm0 0h3.2v6.2H9V9.5Zm13 0v3.2h-6.2V9.5H22Zm-3.2 0H22v6.2h-3.2V9.5ZM9 21.5v-3.2h6.2v3.2H9Zm0-6.2h3.2v6.2H9v-6.2Zm13 6.2h-6.2v-3.2H22v3.2Zm-3.2 0v-6.2H22v6.2h-3.2Z"
         fill="currentColor"
       />
     </svg>

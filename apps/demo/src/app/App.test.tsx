@@ -15,10 +15,10 @@ describe('App', () => {
     ).toBeInTheDocument();
     expect(screen.getByTestId('video-player')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'Open playground' })
+      screen.getByRole('link', { name: 'Install and usage' })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Edit props and re-apply' })
+      screen.getByRole('heading', { name: 'Edit props and remount' })
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'Extensibility surface' })

@@ -1,6 +1,6 @@
-# Testing Strategy
+# Maintainer Testing Strategy
 
-The workspace combines fast validation with browser-level verification for interaction-heavy behavior.
+The repository combines fast validation with browser-level verification for interaction-heavy package behavior.
 
 ## Automated Coverage
 
@@ -10,7 +10,7 @@ The workspace combines fast validation with browser-level verification for inter
 | Demo smoke test    | validates that the demo shell renders and wires the package into the app surface                     |
 | Playwright e2e     | verifies rendered controls, layered settings, keyboard shortcuts, touch seeking, and browser console |
 | Linting            | catches API misuse, TypeScript issues, and hook rule regressions                                     |
-| Type checking      | validates strict TypeScript contracts across the workspace                                           |
+| Type checking      | validates strict TypeScript contracts across the package and demo                                    |
 | Build verification | ensures the package and demo both produce production output                                          |
 
 ## Browser Verification
