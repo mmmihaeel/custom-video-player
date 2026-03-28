@@ -97,10 +97,16 @@ export function SettingsIcon(props: IconProps) {
 export function FullscreenIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
-      <path
-        d="M6 6.5h3.18v6.35H6V6.5Zm0 0h6.35v3.18H6V6.5Zm0 18h3.18v-6.35H6V24.5Zm0-3.18h6.35v3.18H6v-3.18Zm18-14.82v3.18h-6.35V6.5H24Zm-3.18 0H24v6.35h-3.18V6.5ZM24 24.5v-3.18h-6.35v3.18H24Zm-3.18 0H24v-6.35h-3.18V24.5Z"
-        fill="currentColor"
-      />
+      <g fill="currentColor">
+        <rect x="7" y="7" width="3" height="6" />
+        <rect x="7" y="7" width="6" height="3" />
+        <rect x="7" y="18" width="3" height="6" />
+        <rect x="7" y="21" width="6" height="3" />
+        <rect x="18" y="7" width="6" height="3" />
+        <rect x="21" y="7" width="3" height="6" />
+        <rect x="18" y="21" width="6" height="3" />
+        <rect x="21" y="18" width="3" height="6" />
+      </g>
     </svg>
   );
 }
@@ -108,10 +114,16 @@ export function FullscreenIcon(props: IconProps) {
 export function ExitFullscreenIcon(props: IconProps) {
   return (
     <svg {...baseProps} {...props} aria-hidden="true">
-      <path
-        d="M9 9.5h6.2v3.2H9V9.5Zm0 0h3.2v6.2H9V9.5Zm13 0v3.2h-6.2V9.5H22Zm-3.2 0H22v6.2h-3.2V9.5ZM9 21.5v-3.2h6.2v3.2H9Zm0-6.2h3.2v6.2H9v-6.2Zm13 6.2h-6.2v-3.2H22v3.2Zm-3.2 0v-6.2H22v6.2h-3.2Z"
-        fill="currentColor"
-      />
+      <g fill="currentColor">
+        <rect x="9" y="9" width="6" height="3" />
+        <rect x="9" y="9" width="3" height="6" />
+        <rect x="16" y="9" width="6" height="3" />
+        <rect x="19" y="9" width="3" height="6" />
+        <rect x="9" y="16" width="3" height="6" />
+        <rect x="9" y="19" width="6" height="3" />
+        <rect x="16" y="19" width="6" height="3" />
+        <rect x="19" y="16" width="3" height="6" />
+      </g>
     </svg>
   );
 }

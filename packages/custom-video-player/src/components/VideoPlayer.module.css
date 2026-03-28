@@ -111,7 +111,7 @@
   block-size: 13px;
   border-radius: 999px;
   content: '';
-  inline-size: 1.5px;
+  inline-size: 2px;
   inset-block-start: 50%;
   inset-inline-end: 0;
   position: absolute;
@@ -144,7 +144,7 @@
   background: rgba(255, 255, 255, 0.82);
   block-size: 14px;
   border-radius: 999px;
-  inline-size: 1.5px;
+  inline-size: 2px;
 }
 
 .timeline:hover .timelineThumb,
@@ -248,8 +248,9 @@
 }
 
 .fullscreenIcon {
-  block-size: 30px !important;
-  inline-size: 30px !important;
+  block-size: 28px !important;
+  display: block;
+  inline-size: 28px !important;
 }
 
 .iconButton:hover,
@@ -550,8 +551,8 @@
   }
 
   .fullscreenIcon {
-    block-size: 26px !important;
-    inline-size: 26px !important;
+    block-size: 24px !important;
+    inline-size: 24px !important;
   }
 
   .timecode {
