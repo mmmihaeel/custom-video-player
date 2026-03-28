@@ -99,6 +99,74 @@ describe('VideoPlayer', () => {
     ).toBeInTheDocument();
   });
 
+  it('applies startup defaults and label overrides', async () => {
+    const { container } = renderPlayer({
+      defaultPlaybackRate: 1.25,
+      defaultVolume: 0.35,
+      labels: {
+        play: 'Begin playback',
+        settings: 'Player options'
+      },
+      loop: true,
+      muted: true
+    });
+
+    const video = container.querySelector('video');
+
+    if (!video) {
+      throw new Error('Video element was not rendered.');
+    }
+
+    await waitFor(() => {
+      expect(video.playbackRate).toBe(1.25);
+      expect(video.volume).toBeCloseTo(0.35);
+      expect(video.muted).toBe(true);
+      expect(video.loop).toBe(true);
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Begin playback' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Player options' })
+    ).toBeInTheDocument();
+  });
+
+  it('emits settings and audio callbacks for host integrations', async () => {
+    const user = userEvent.setup();
+    const onMuteChange = vi.fn();
+    const onSettingsChange = vi.fn();
+    const onSettingsOpenChange = vi.fn();
+
+    renderPlayer({
+      onMuteChange,
+      onSettingsChange,
+      onSettingsOpenChange
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Mute audio' }));
+    await waitFor(() => {
+      expect(onMuteChange).toHaveBeenLastCalledWith(true);
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Playback settings' }));
+    await waitFor(() => {
+      expect(onSettingsOpenChange).toHaveBeenLastCalledWith(true);
+      expect(onSettingsChange).toHaveBeenLastCalledWith({
+        isOpen: true,
+        view: 'root'
+      });
+    });
+
+    await user.click(screen.getByRole('button', { name: /Quality/i }));
+    await waitFor(() => {
+      expect(onSettingsChange).toHaveBeenLastCalledWith({
+        isOpen: true,
+        view: 'quality'
+      });
+    });
+  });
+
   it('emits a normalized state snapshot for host integrations', async () => {
     const onStateChange = vi.fn();
 

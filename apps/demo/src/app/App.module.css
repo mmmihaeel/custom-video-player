@@ -203,6 +203,12 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.presetGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .featureCard,
 .stateCard {
   background: rgba(20, 26, 40, 0.03);
@@ -214,10 +220,50 @@
   padding: 16px 18px;
 }
 
+.presetCard {
+  background: rgba(20, 26, 40, 0.03);
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 22px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.presetCard[data-active] {
+  border-color: rgba(21, 26, 37, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(21, 26, 37, 0.08);
+}
+
 .featureCard strong,
 .stateCard strong {
   color: #151b2a;
   font-size: 1rem;
+}
+
+.presetDescription {
+  color: #55617b;
+  line-height: 1.62;
+  margin: 0;
+}
+
+.presetSwatches {
+  display: flex;
+  gap: 10px;
+}
+
+.presetSwatch {
+  block-size: 18px;
+  border: 1px solid rgba(20, 26, 40, 0.08);
+  border-radius: 999px;
+  inline-size: 18px;
+}
+
+.presetHighlights {
+  color: #4f5b74;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
 }
 
 .stateCard span {
@@ -420,6 +466,7 @@
   }
 
   .featureGrid,
+  .presetGrid,
   .stateGrid {
     grid-template-columns: 1fr;
   }
@@ -508,6 +555,12 @@
     line-height: 1.52;
     padding: 12px 14px;
   }
+
+  .presetCard {
+    border-radius: 18px;
+    gap: 12px;
+    padding: 14px;
+  }
 }
 
 @media (min-width: 1400px) {
@@ -546,6 +599,10 @@
   }
 
   .featureGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .presetGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

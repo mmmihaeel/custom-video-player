@@ -125,6 +125,41 @@ test('fullscreen can be entered and exited from the player control', async ({
   ).toBeVisible();
 });
 
+test('preset variants restyle the main player and remount API defaults', async ({
+  page
+}) => {
+  await page.goto('/');
+
+  const player = page.locator('section[aria-label="Video player"]');
+
+  await page
+    .getByRole('button', { name: 'Load Paper Editorial preset' })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Begin playback' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Player options' })
+  ).toBeVisible();
+  await expect
+    .poll(async () =>
+      player.evaluate((element) =>
+        element.style.getPropertyValue('--cvp-control').trim()
+      )
+    )
+    .toBe('#f6efe2');
+
+  await page
+    .getByRole('button', { name: 'Load Signal Preview preset' })
+    .click();
+  await expect(
+    page.getByRole('button', { name: 'Start preview' })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Unmute audio' })
+  ).toBeVisible();
+});
+
 test.describe('mobile interactions', () => {
   test.use({
     hasTouch: true,

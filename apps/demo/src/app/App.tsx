@@ -1,9 +1,11 @@
 import {
   VideoPlayer,
   type VideoChapter,
+  type VideoPlayerLabels,
   type VideoPlayerMetadata,
   type VideoPlayerState,
   type VideoPlayerSettingsState,
+  type VideoPlayerTheme,
   type VideoQualityValue
 } from '@mmmihaeel/custom-video-player';
 import {
@@ -45,6 +47,29 @@ type AppliedConfig = {
 };
 
 type InstallClient = 'npm' | 'pnpm' | 'yarn';
+type PresetId = 'default' | 'studio' | 'paper' | 'signal';
+
+type PlayerPreset = {
+  id: PresetId;
+  title: string;
+  description: string;
+  highlights: readonly string[];
+  swatches: readonly string[];
+  configOverrides?: Partial<
+    Pick<
+      AppliedConfig,
+      | 'autoPlay'
+      | 'defaultQuality'
+      | 'defaultVolume'
+      | 'loop'
+      | 'muted'
+      | 'playbackRates'
+      | 'seekStep'
+    >
+  >;
+  labels?: Partial<VideoPlayerLabels>;
+  theme?: Partial<VideoPlayerTheme>;
+};
 
 const PACKAGE_NAME = '@mmmihaeel/custom-video-player';
 const INSTALL_COMMANDS: Record<InstallClient, string> = {
@@ -83,9 +108,15 @@ const PROP_ROWS = [
   ['source', 'VideoSource', 'Required HLS source descriptor.'],
   ['chapters', 'VideoChapter[]', 'Normalized timeline chapter markers.'],
   ['durationHint', 'number', 'Fallback duration before metadata resolves.'],
+  ['poster', 'string', 'Poster image displayed before playback starts.'],
+  ['autoPlay', 'boolean', 'Attempts startup playback when policy allows it.'],
+  ['muted', 'boolean', 'Forces a muted startup state.'],
+  ['loop', 'boolean', 'Restarts playback automatically after the end state.'],
   ['defaultQuality', `'auto' | number`, 'Initial quality preference.'],
+  ['defaultPlaybackRate', 'number', 'Initial playback speed.'],
   ['defaultVolume', 'number', 'Initial volume in the `0..1` range.'],
   ['playbackRates', 'number[]', 'Visible speed options in the settings menu.'],
+  ['preload', `'none' | 'metadata' | 'auto'`, 'Native media preload hint.'],
   ['seekStep', 'number', 'Keyboard seek increment in seconds.'],
   [
     'theme',
@@ -101,11 +132,26 @@ const PROP_ROWS = [
 
 const CALLBACK_ROWS = [
   ['onReady', 'Receives the media element, duration, and quality metadata.'],
+  [
+    'onLoadedMetadata',
+    'Emits the same metadata shape once media metadata resolves.'
+  ],
   ['onSeek', 'Emits manual timeline and keyboard seeking.'],
+  ['onTimeUpdate', 'Reports playback time changes for synchronized host UI.'],
   ['onBufferedChange', 'Reports buffered progress for host analytics or UI.'],
   ['onStateChange', 'Publishes a normalized runtime snapshot for host logic.'],
   ['onWaitingChange', 'Signals loading and stall transitions.'],
   ['onSettingsChange', 'Reports settings menu open state and active panel.'],
+  [
+    'onSettingsOpenChange',
+    'Reports settings visibility without the nested view payload.'
+  ],
+  ['onPlaybackRateChange', 'Reports user-selected speed changes.'],
+  ['onQualityChange', 'Reports manual or automatic quality selection changes.'],
+  ['onVolumeChange', 'Reports normalized volume changes.'],
+  ['onMuteChange', 'Reports mute state transitions.'],
+  ['onChapterChange', 'Reports the currently active chapter marker.'],
+  ['onFullscreenChange', 'Reports viewport fullscreen transitions.'],
   ['onPictureInPictureChange', 'Reports PiP transitions when supported.']
 ] as const;
 
@@ -116,6 +162,111 @@ const SHORTCUT_ROWS = [
   ['M', 'Mute or restore audio'],
   ['F', 'Toggle fullscreen'],
   ['I', 'Toggle Picture-in-Picture']
+] as const;
+
+const PLAYER_PRESETS: readonly PlayerPreset[] = [
+  {
+    id: 'default',
+    title: 'Assignment Default',
+    description:
+      'The exact package presentation used for the main assignment preview.',
+    highlights: [
+      'No extra label overrides',
+      'Adaptive quality startup',
+      'Balanced desktop and mobile defaults'
+    ],
+    swatches: ['#ffffff', '#101114', '#97a3c2']
+  },
+  {
+    id: 'studio',
+    title: 'Studio Dark',
+    description:
+      'A denser dark broadcast treatment with a manual 720p preference.',
+    highlights: [
+      'Theme tokens remap the full control palette',
+      'Starts with 720p when the stream level exists',
+      'Uses a slightly hotter playback rate list'
+    ],
+    swatches: ['#f4f7ff', '#0d1118', '#94a7d6'],
+    configOverrides: {
+      defaultQuality: 720,
+      defaultVolume: 0.58,
+      playbackRates: [0.75, 1, 1.25, 1.5, 2]
+    },
+    theme: {
+      bufferedColor: 'rgba(244, 247, 255, 0.18)',
+      chapterMarkerColor: 'rgba(148, 167, 214, 0.58)',
+      controlColor: '#f4f7ff',
+      menuBackground: 'rgba(11, 15, 24, 0.96)',
+      menuBorderColor: 'rgba(244, 247, 255, 0.12)',
+      railColor: 'rgba(244, 247, 255, 0.26)',
+      shadowColor: '0 26px 54px rgba(7, 9, 13, 0.42)',
+      surfaceBackground: '#0d1118'
+    }
+  },
+  {
+    id: 'paper',
+    title: 'Paper Editorial',
+    description:
+      'A warmer surface treatment with softer runtime defaults and calmer copy.',
+    highlights: [
+      'Custom labels prove the copy layer is overridable',
+      'Theme shifts the player toward a warmer presentation',
+      'Playback defaults stay conservative for embedded article layouts'
+    ],
+    swatches: ['#f6efe2', '#1a2335', '#d7c1a4'],
+    configOverrides: {
+      defaultVolume: 0.46,
+      playbackRates: [0.75, 1, 1.25, 1.5]
+    },
+    labels: {
+      play: 'Begin playback',
+      replay: 'Play again',
+      settings: 'Player options'
+    },
+    theme: {
+      bufferedColor: 'rgba(246, 239, 226, 0.2)',
+      chapterMarkerColor: 'rgba(215, 193, 164, 0.52)',
+      controlColor: '#f6efe2',
+      menuBackground: 'rgba(26, 35, 53, 0.96)',
+      menuBorderColor: 'rgba(246, 239, 226, 0.12)',
+      railColor: 'rgba(246, 239, 226, 0.24)',
+      shadowColor: '0 24px 48px rgba(23, 26, 37, 0.3)',
+      surfaceBackground: '#161b27'
+    }
+  },
+  {
+    id: 'signal',
+    title: 'Signal Preview',
+    description:
+      'A more assertive accent variant configured for muted ambient preview flows.',
+    highlights: [
+      'Muted startup covers preview-card scenarios',
+      'Seek step increases to ten seconds',
+      'Accent chapter markers validate the theme token edge cases'
+    ],
+    swatches: ['#fff1ef', '#14080a', '#ff726c'],
+    configOverrides: {
+      defaultVolume: 0,
+      muted: true,
+      playbackRates: [0.5, 1, 1.5, 2],
+      seekStep: 10
+    },
+    labels: {
+      play: 'Start preview',
+      replay: 'Replay preview'
+    },
+    theme: {
+      bufferedColor: 'rgba(255, 241, 239, 0.16)',
+      chapterMarkerColor: 'rgba(255, 114, 108, 0.52)',
+      controlColor: '#fff1ef',
+      menuBackground: 'rgba(20, 8, 10, 0.96)',
+      menuBorderColor: 'rgba(255, 241, 239, 0.14)',
+      railColor: 'rgba(255, 241, 239, 0.25)',
+      shadowColor: '0 28px 56px rgba(15, 4, 6, 0.42)',
+      surfaceBackground: '#14080a'
+    }
+  }
 ] as const;
 
 function buildDefaultDraft(baseUrl: string): DraftConfig {
@@ -238,6 +389,7 @@ export function App() {
     () => parseDraftConfig(defaultDraft).config!,
     [defaultDraft]
   );
+  const [activePresetId, setActivePresetId] = useState<PresetId>('default');
   const [installClient, setInstallClient] = useState<InstallClient>('pnpm');
   const [draftConfig, setDraftConfig] = useState(defaultDraft);
   const [appliedConfig, setAppliedConfig] =
@@ -249,6 +401,26 @@ export function App() {
     'Ready for interaction.'
   ]);
   const [isPending, startTransition] = useTransition();
+  const activePreset = useMemo<PlayerPreset>(
+    () =>
+      PLAYER_PRESETS.find((preset) => preset.id === activePresetId) ??
+      PLAYER_PRESETS[0]!,
+    [activePresetId]
+  );
+  const resolvedConfig = useMemo(
+    () => ({
+      ...appliedConfig,
+      ...activePreset.configOverrides
+    }),
+    [activePreset.configOverrides, appliedConfig]
+  );
+  const presetPresentationProps = useMemo(
+    () => ({
+      ...(activePreset.labels ? { labels: activePreset.labels } : {}),
+      ...(activePreset.theme ? { theme: activePreset.theme } : {})
+    }),
+    [activePreset.labels, activePreset.theme]
+  );
   const installSnippet = INSTALL_COMMANDS[installClient];
   const assignmentInputSnippet = useMemo(
     () =>
@@ -270,15 +442,17 @@ export function App() {
   );
   const playerKey = [
     playerRevision,
-    appliedConfig.sourceUrl,
-    appliedConfig.posterUrl,
-    appliedConfig.defaultQuality,
-    appliedConfig.defaultVolume,
-    appliedConfig.durationHint,
-    appliedConfig.seekStep,
-    appliedConfig.playbackRates.join('-')
+    activePresetId,
+    resolvedConfig.sourceUrl,
+    resolvedConfig.posterUrl,
+    resolvedConfig.defaultQuality,
+    resolvedConfig.defaultVolume,
+    resolvedConfig.durationHint,
+    resolvedConfig.seekStep,
+    resolvedConfig.playbackRates.join('-')
   ].join(':');
   const stateCards = [
+    ['Preset', activePreset.title],
     ['Playback', playerState?.isPlaying ? 'Playing' : 'Paused'],
     [
       'Quality',
@@ -309,6 +483,18 @@ export function App() {
     value: DraftConfig[K]
   ) {
     setDraftConfig((current) => ({ ...current, [key]: value }));
+  }
+
+  function activatePreset(presetId: PresetId) {
+    setActivePresetId(presetId);
+    const preset = PLAYER_PRESETS.find((entry) => entry.id === presetId);
+
+    if (!preset) {
+      return;
+    }
+
+    appendEvent(setEventLog, `Preset applied: ${preset.title}`);
+    setPlayerRevision((value) => value + 1);
   }
 
   function applyDraftConfig() {
@@ -417,17 +603,18 @@ export function App() {
           <article className={styles.playerCard}>
             <VideoPlayer
               key={playerKey}
-              source={{ type: 'hls', src: appliedConfig.sourceUrl }}
-              durationHint={appliedConfig.durationHint}
-              chapters={appliedConfig.chapters}
-              poster={appliedConfig.posterUrl}
-              autoPlay={appliedConfig.autoPlay}
-              muted={appliedConfig.muted}
-              loop={appliedConfig.loop}
-              defaultQuality={appliedConfig.defaultQuality}
-              defaultVolume={appliedConfig.defaultVolume}
-              playbackRates={appliedConfig.playbackRates}
-              seekStep={appliedConfig.seekStep}
+              source={{ type: 'hls', src: resolvedConfig.sourceUrl }}
+              durationHint={resolvedConfig.durationHint}
+              chapters={resolvedConfig.chapters}
+              poster={resolvedConfig.posterUrl}
+              autoPlay={resolvedConfig.autoPlay}
+              muted={resolvedConfig.muted}
+              loop={resolvedConfig.loop}
+              defaultQuality={resolvedConfig.defaultQuality}
+              defaultVolume={resolvedConfig.defaultVolume}
+              playbackRates={resolvedConfig.playbackRates}
+              seekStep={resolvedConfig.seekStep}
+              {...presetPresentationProps}
               onReady={(metadata: VideoPlayerMetadata) =>
                 appendEvent(
                   setEventLog,
@@ -506,6 +693,65 @@ export function App() {
               }
             />
           </article>
+        </section>
+
+        <section id="variants" className={styles.section}>
+          <div className={styles.cardHeader}>
+            <span className={styles.sectionLabel}>Preset variants</span>
+            <h2 className={styles.cardTitle}>
+              Stress-test theming, labels, and startup defaults
+            </h2>
+          </div>
+          <p className={styles.sectionIntro}>
+            These presets remount the same package surface with different theme
+            tokens, label overrides, and playback defaults. They are here to
+            make API behavior visible without editing source code by hand.
+          </p>
+          <div className={styles.presetGrid}>
+            {PLAYER_PRESETS.map((preset) => (
+              <article
+                key={preset.id}
+                className={styles.presetCard}
+                data-active={activePresetId === preset.id ? '' : undefined}
+              >
+                <div className={styles.cardHeader}>
+                  <span className={styles.sectionLabel}>{preset.title}</span>
+                  <p className={styles.presetDescription}>
+                    {preset.description}
+                  </p>
+                </div>
+                <div className={styles.presetSwatches} aria-hidden="true">
+                  {preset.swatches.map((swatch) => (
+                    <span
+                      key={`${preset.id}-${swatch}`}
+                      className={styles.presetSwatch}
+                      style={{ background: swatch }}
+                    />
+                  ))}
+                </div>
+                <ul className={styles.presetHighlights}>
+                  {preset.highlights.map((highlight) => (
+                    <li key={highlight}>{highlight}</li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => activatePreset(preset.id)}
+                >
+                  {activePresetId === preset.id
+                    ? `${preset.title} active`
+                    : `Load ${preset.title} preset`}
+                </button>
+              </article>
+            ))}
+          </div>
+          <p className={styles.helperNote}>
+            Presets reuse the same player instance contract. If a preset changes
+            startup defaults such as quality, mute, or playback rates, the demo
+            remounts the player so those defaults are applied the same way they
+            would be in a host app.
+          </p>
         </section>
 
         <section id="usage" className={styles.section}>

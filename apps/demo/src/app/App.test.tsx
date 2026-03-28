@@ -21,6 +21,11 @@ describe('App', () => {
       screen.getByRole('heading', { name: 'Edit props and remount' })
     ).toBeInTheDocument();
     expect(
+      screen.getByRole('heading', {
+        name: 'Stress-test theming, labels, and startup defaults'
+      })
+    ).toBeInTheDocument();
+    expect(
       screen.getByRole('heading', { name: 'Extensibility surface' })
     ).toBeInTheDocument();
   });
