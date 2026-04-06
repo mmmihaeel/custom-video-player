@@ -1,4 +1,5 @@
 import {
+  type Dispatch,
   useEffect,
   useEffectEvent,
   useMemo,
@@ -6,9 +7,11 @@ import {
   useState,
   type KeyboardEvent,
   type PointerEvent,
-  type RefObject
+  type RefObject,
+  type SetStateAction
 } from 'react';
 import type {
+  AnalyticsEvent,
   VideoChapter,
   VideoPlayerLabels,
   VideoPlayerMenuView,
@@ -30,6 +33,74 @@ type TimelinePreview = {
   time: number;
 };
 
+export type VideoPlayerMediaProps = {
+  autoPlay: boolean;
+  loop: boolean;
+  onClick: () => void;
+  onDoubleClick: () => void;
+  playsInline: true;
+  poster: string | undefined;
+  preload: 'none' | 'metadata' | 'auto';
+};
+
+export type VideoPlayerRuntime = {
+  bufferedPercent: number;
+  chapterSegments: ReturnType<typeof getChapterSegments>;
+  clearPreview: () => void;
+  currentChapter: VideoChapter | null;
+  currentTime: number;
+  error: Error | null;
+  handleRootKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+  handleTimelineKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
+  handleTimelinePointerDown: (event: PointerEvent<HTMLDivElement>) => void;
+  handleTimelinePointerMove: (event: PointerEvent<HTMLDivElement>) => void;
+  handleTimelinePointerUp: (event: PointerEvent<HTMLDivElement>) => void;
+  handleVideoClick: () => void;
+  handleVideoDoubleClick: () => void;
+  handleVolumeKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
+  handleVolumePointerDown: (event: PointerEvent<HTMLDivElement>) => void;
+  handleVolumePointerMove: (event: PointerEvent<HTMLDivElement>) => void;
+  handleVolumePointerUp: (event: PointerEvent<HTMLDivElement>) => void;
+  hasStartedPlayback: boolean;
+  isCompactLayout: boolean;
+  isEnded: boolean;
+  isFullscreen: boolean;
+  isMenuOpen: boolean;
+  isMuted: boolean;
+  isPictureInPicture: boolean;
+  isPictureInPictureSupported: boolean;
+  isPlaying: boolean;
+  isScrubbing: boolean;
+  isWaiting: boolean;
+  mediaProps: VideoPlayerMediaProps;
+  menuRef: RefObject<HTMLDivElement | null>;
+  menuView: VideoPlayerMenuView;
+  playbackRate: number;
+  playbackRateOptions: readonly number[];
+  progressPercent: number;
+  qualityOptions: readonly VideoQualityOption[];
+  replay: () => void;
+  resolvedDuration: number;
+  retry: () => void;
+  selectedQuality: VideoQualityValue;
+  setIsMenuOpen: Dispatch<SetStateAction<boolean>>;
+  setMenuView: Dispatch<SetStateAction<VideoPlayerMenuView>>;
+  setPlaybackRate: (nextRate: number) => void;
+  setQuality: (quality: VideoQualityValue) => void;
+  setVolume: (nextVolume: number) => void;
+  settingsButtonRef: RefObject<HTMLButtonElement | null>;
+  timelinePreview: TimelinePreview | null;
+  timelineRef: RefObject<HTMLDivElement | null>;
+  toggleFullscreen: () => Promise<void> | void;
+  toggleMute: () => void;
+  togglePictureInPicture: () => Promise<void> | void;
+  togglePlayback: () => void;
+  toggleSettingsMenu: () => void;
+  tooltipRef: RefObject<HTMLDivElement | null>;
+  volume: number;
+  volumeRef: RefObject<HTMLDivElement | null>;
+};
+
 type UseVideoPlayerOptions = {
   autoPlay: boolean;
   chapters: readonly VideoChapter[];
@@ -47,6 +118,7 @@ type UseVideoPlayerOptions = {
       }) => void)
     | undefined;
   onChapterChange: ((chapter: VideoChapter | null) => void) | undefined;
+  onAnalyticsEvent: ((event: AnalyticsEvent) => void) | undefined;
   onError: ((error: Error) => void) | undefined;
   onFullscreenChange: ((isFullscreen: boolean) => void) | undefined;
   onMuteChange: ((muted: boolean) => void) | undefined;
@@ -57,6 +129,7 @@ type UseVideoPlayerOptions = {
   onReady: ((metadata: VideoPlayerMetadata) => void) | undefined;
   onLoadedMetadata: ((metadata: VideoPlayerMetadata) => void) | undefined;
   onPlaybackRateChange: ((rate: number) => void) | undefined;
+  onQualityChange: ((quality: VideoQualityValue) => void) | undefined;
   onStateChange: ((state: VideoPlayerState) => void) | undefined;
   onSettingsChange: ((payload: VideoPlayerSettingsState) => void) | undefined;
   onSettingsOpenChange: ((isOpen: boolean) => void) | undefined;
@@ -109,6 +182,7 @@ export function useVideoPlayer({
   labels,
   loop = false,
   muted = false,
+  onAnalyticsEvent,
   onBufferedChange,
   onChapterChange,
   onError,
@@ -121,6 +195,7 @@ export function useVideoPlayer({
   onReady,
   onLoadedMetadata,
   onPlaybackRateChange,
+  onQualityChange,
   onStateChange,
   onSettingsChange,
   onSettingsOpenChange,
@@ -139,7 +214,7 @@ export function useVideoPlayer({
   setQuality,
   sourceError,
   videoRef
-}: UseVideoPlayerOptions) {
+}: UseVideoPlayerOptions): VideoPlayerRuntime {
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
   const volumeRef = useRef<HTMLDivElement | null>(null);
@@ -147,6 +222,18 @@ export function useVideoPlayer({
   const settingsButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastAudibleVolumeRef = useRef(clamp(defaultVolume, 0, 1) || 1);
   const lastChapterKeyRef = useRef<string | null>(null);
+  const lastChapterValueRef = useRef<VideoChapter | null>(null);
+  const hasInitializedChapterRef = useRef(false);
+  const hasInitializedFullscreenRef = useRef(false);
+  const didNotifyPauseRef = useRef(false);
+  const pendingPlaybackRateRef = useRef<{
+    fromRate: number;
+    toRate: number;
+  } | null>(null);
+  const pendingVolumeAnalyticsRef = useRef<{
+    fromMuted: boolean;
+    fromVolume: number;
+  } | null>(null);
 
   const [bufferedEnd, setBufferedEnd] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -222,6 +309,24 @@ export function useVideoPlayer({
       : 0;
   const error = mediaError ?? sourceError;
 
+  const getAnalyticsSnapshot = useEffectEvent(() => {
+    const video = videoRef.current;
+    const nextDuration =
+      video && Number.isFinite(video.duration) && video.duration > 0
+        ? video.duration
+        : resolvedDuration;
+
+    return {
+      currentTime: video?.currentTime ?? currentTime,
+      duration: nextDuration,
+      timestamp: Date.now()
+    };
+  });
+
+  const emitAnalyticsEvent = useEffectEvent((event: AnalyticsEvent) => {
+    onAnalyticsEvent?.(event);
+  });
+
   const syncFromVideo = useEffectEvent(() => {
     const video = videoRef.current;
 
@@ -285,12 +390,23 @@ export function useVideoPlayer({
       return;
     }
 
+    const fromTime = video.currentTime || currentTime;
     const nextTime = clamp(time, 0, resolvedDuration);
+
+    if (Math.abs(nextTime - fromTime) < 0.01) {
+      return;
+    }
 
     video.currentTime = nextTime;
     setCurrentTime(nextTime);
     onSeek?.(nextTime);
     onTimeUpdate?.(nextTime);
+    emitAnalyticsEvent({
+      type: 'seek',
+      ...getAnalyticsSnapshot(),
+      fromTime,
+      toTime: nextTime
+    });
   });
 
   const togglePlayback = useEffectEvent(() => {
@@ -322,6 +438,20 @@ export function useVideoPlayer({
     }
 
     const clampedVolume = clamp(nextVolume, 0, 1);
+    const fromMuted = video.muted || video.volume <= 0;
+    const fromVolume = video.volume;
+
+    if (
+      Math.abs(clampedVolume - fromVolume) < 0.001 &&
+      fromMuted === (clampedVolume === 0)
+    ) {
+      return;
+    }
+
+    pendingVolumeAnalyticsRef.current = {
+      fromMuted,
+      fromVolume
+    };
     video.volume = clampedVolume;
     video.muted = clampedVolume === 0;
 
@@ -356,6 +486,11 @@ export function useVideoPlayer({
       return;
     }
 
+    pendingVolumeAnalyticsRef.current = {
+      fromMuted: video.muted || video.volume <= 0,
+      fromVolume: video.volume
+    };
+
     if (video.muted || video.volume === 0) {
       video.muted = false;
       video.volume = clamp(lastAudibleVolumeRef.current, 0.1, 1);
@@ -378,9 +513,35 @@ export function useVideoPlayer({
       return;
     }
 
+    const fromRate = video.playbackRate;
+
+    if (Math.abs(fromRate - nextRate) < 0.001) {
+      return;
+    }
+
+    pendingPlaybackRateRef.current = {
+      fromRate,
+      toRate: nextRate
+    };
     video.playbackRate = nextRate;
     setPlaybackRateState(nextRate);
-    onPlaybackRateChange?.(nextRate);
+    video.dispatchEvent(new Event('ratechange'));
+  });
+
+  const selectQuality = useEffectEvent((quality: VideoQualityValue) => {
+    if (selectedQuality === quality) {
+      return;
+    }
+
+    const fromQuality = selectedQuality;
+    setQuality(quality);
+    onQualityChange?.(quality);
+    emitAnalyticsEvent({
+      type: 'qualityChange',
+      ...getAnalyticsSnapshot(),
+      fromQuality,
+      toQuality: quality
+    });
   });
 
   const clearPreview = useEffectEvent(() => {
@@ -504,24 +665,66 @@ export function useVideoPlayer({
     }
 
     const handlePlay = () => {
+      didNotifyPauseRef.current = false;
       setHasStartedPlayback(true);
       setIsEnded(false);
       setIsPlaying(true);
       setIsWaiting(false);
       onPlay?.();
+      emitAnalyticsEvent({
+        type: 'play',
+        ...getAnalyticsSnapshot(),
+        isMuted: video.muted || video.volume <= 0,
+        playbackRate: video.playbackRate,
+        selectedQuality,
+        volume: video.volume
+      });
     };
 
     const handlePause = () => {
       setIsPlaying(false);
+
+      if (didNotifyPauseRef.current) {
+        return;
+      }
+
+      didNotifyPauseRef.current = true;
+
+      if (video.ended) {
+        onPause?.();
+        return;
+      }
+
       onPause?.();
+      emitAnalyticsEvent({
+        type: 'pause',
+        ...getAnalyticsSnapshot(),
+        isMuted: video.muted || video.volume <= 0,
+        playbackRate: video.playbackRate,
+        selectedQuality,
+        volume: video.volume
+      });
     };
 
     const handleEnded = () => {
       setHasStartedPlayback(true);
       setIsEnded(true);
       setIsPlaying(false);
-      onPause?.();
+
+      if (!didNotifyPauseRef.current) {
+        didNotifyPauseRef.current = true;
+        onPause?.();
+      }
+
       onEnded?.();
+      emitAnalyticsEvent({
+        type: 'ended',
+        ...getAnalyticsSnapshot(),
+        isMuted: video.muted || video.volume <= 0,
+        playbackRate: video.playbackRate,
+        selectedQuality,
+        volume: video.volume
+      });
     };
 
     const handleWaiting = () => {
@@ -555,11 +758,39 @@ export function useVideoPlayer({
       syncFromVideo();
       onVolumeChange?.(video.volume);
       onMuteChange?.(video.muted || video.volume <= 0);
+
+      if (!pendingVolumeAnalyticsRef.current) {
+        return;
+      }
+
+      const pending = pendingVolumeAnalyticsRef.current;
+      pendingVolumeAnalyticsRef.current = null;
+      emitAnalyticsEvent({
+        type: 'volumeChange',
+        ...getAnalyticsSnapshot(),
+        fromMuted: pending.fromMuted,
+        fromVolume: pending.fromVolume,
+        toMuted: video.muted || video.volume <= 0,
+        toVolume: video.volume
+      });
     };
 
     const handleRateChange = () => {
       syncFromVideo();
+
+      if (!pendingPlaybackRateRef.current) {
+        return;
+      }
+
+      const pending = pendingPlaybackRateRef.current;
+      pendingPlaybackRateRef.current = null;
       onPlaybackRateChange?.(video.playbackRate);
+      emitAnalyticsEvent({
+        type: 'speedChange',
+        ...getAnalyticsSnapshot(),
+        fromRate: pending.fromRate,
+        toRate: video.playbackRate
+      });
     };
 
     const handleProgress = () => {
@@ -623,6 +854,7 @@ export function useVideoPlayer({
     onReady,
     onWaitingChange,
     onLoadedMetadata,
+    onAnalyticsEvent,
     qualities,
     resolvedDuration,
     selectedQuality,
@@ -664,6 +896,20 @@ export function useVideoPlayer({
 
     lastChapterKeyRef.current = key;
     onChapterChange?.(currentChapter);
+
+    if (!hasInitializedChapterRef.current) {
+      hasInitializedChapterRef.current = true;
+      lastChapterValueRef.current = currentChapter;
+      return;
+    }
+
+    emitAnalyticsEvent({
+      type: 'chapterChange',
+      ...getAnalyticsSnapshot(),
+      fromChapter: lastChapterValueRef.current,
+      toChapter: currentChapter
+    });
+    lastChapterValueRef.current = currentChapter;
   }, [currentChapter, onChapterChange]);
 
   useEffect(() => {
@@ -719,6 +965,19 @@ export function useVideoPlayer({
     selectedQuality,
     volume
   ]);
+
+  useEffect(() => {
+    if (!hasInitializedFullscreenRef.current) {
+      hasInitializedFullscreenRef.current = true;
+      return;
+    }
+
+    emitAnalyticsEvent({
+      type: 'fullscreenToggle',
+      ...getAnalyticsSnapshot(),
+      isFullscreen
+    });
+  }, [isFullscreen]);
 
   useEffect(() => {
     const handlePointerDown = (event: globalThis.PointerEvent) => {
@@ -997,7 +1256,7 @@ export function useVideoPlayer({
     setIsMenuOpen,
     setMenuView,
     setPlaybackRate,
-    setQuality,
+    setQuality: selectQuality,
     setVolume,
     settingsButtonRef,
     timelinePreview,

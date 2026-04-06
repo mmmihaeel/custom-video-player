@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@mmmihaeel/custom-video-player": [
         "../../packages/custom-video-player/src/index.ts"

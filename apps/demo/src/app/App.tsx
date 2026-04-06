@@ -1,4 +1,5 @@
 import {
+  type AnalyticsEvent,
   VideoPlayer,
   type VideoChapter,
   type VideoPlayerLabels,
@@ -88,8 +89,8 @@ const FEATURE_ROWS = [
     'Hover metadata, chapter markers, and click-to-seek behavior.'
   ],
   [
-    'Host callbacks',
-    'Playback, buffering, settings, viewport, and state events.'
+    'Typed analytics contract',
+    'Discriminated analytics events plus callback-driven host orchestration.'
   ],
   [
     'Keyboard and touch support',
@@ -99,8 +100,8 @@ const FEATURE_ROWS = [
 
 const INTEGRATION_ROWS = [
   'Provide normalized media and chapter data from the host app.',
-  'Keep fetching, auth, persistence, and analytics orchestration outside the package.',
-  'Use callbacks when you need telemetry, custom UI reactions, or synchronized state.',
+  'Keep fetching, auth, persistence, and analytics vendor wiring outside the package.',
+  'Use callbacks or the typed analytics contract when you need telemetry, custom UI reactions, or synchronized state.',
   'Override labels or root styling without replacing the player runtime.'
 ] as const;
 
@@ -146,13 +147,38 @@ const CALLBACK_ROWS = [
     'onSettingsOpenChange',
     'Reports settings visibility without the nested view payload.'
   ],
+  [
+    'onAnalyticsEvent',
+    'Emits a typed discriminated analytics event for meaningful playback interactions.'
+  ],
   ['onPlaybackRateChange', 'Reports user-selected speed changes.'],
-  ['onQualityChange', 'Reports manual or automatic quality selection changes.'],
+  ['onQualityChange', 'Reports user-selected quality preference changes.'],
   ['onVolumeChange', 'Reports normalized volume changes.'],
   ['onMuteChange', 'Reports mute state transitions.'],
   ['onChapterChange', 'Reports the currently active chapter marker.'],
   ['onFullscreenChange', 'Reports viewport fullscreen transitions.'],
   ['onPictureInPictureChange', 'Reports PiP transitions when supported.']
+] as const;
+
+const ANALYTICS_ROWS = [
+  ['play', 'Playback started with volume, mute state, quality, and speed.'],
+  ['pause', 'Playback paused without conflating the terminal ended state.'],
+  ['seek', 'Timeline or keyboard seek with `fromTime` and `toTime`.'],
+  [
+    'qualityChange',
+    'Quality preference changed with `fromQuality` and `toQuality`.'
+  ],
+  ['speedChange', 'Playback speed changed with `fromRate` and `toRate`.'],
+  ['fullscreenToggle', 'Viewport fullscreen state toggled.'],
+  [
+    'volumeChange',
+    'Audio state changed with previous and next mute/volume data.'
+  ],
+  [
+    'chapterChange',
+    'Active chapter boundary moved from one marker to another.'
+  ],
+  ['ended', 'Playback reached the ended state with runtime snapshot metadata.']
 ] as const;
 
 const SHORTCUT_ROWS = [
@@ -375,6 +401,36 @@ function appendEvent(
   );
 }
 
+function appendAnalyticsEvent(
+  setEvents: Dispatch<SetStateAction<AnalyticsEvent[]>>,
+  nextEvent: AnalyticsEvent
+) {
+  setEvents((current) => [nextEvent, ...current].slice(0, 6));
+}
+
+function describeAnalyticsEvent(event: AnalyticsEvent) {
+  switch (event.type) {
+    case 'play':
+    case 'pause':
+    case 'ended':
+      return `${event.type}: ${event.selectedQuality === 'auto' ? 'Auto' : `${event.selectedQuality}p`} at ${formatTime(event.currentTime)} (${Math.round(event.volume * 100)}% volume)`;
+    case 'seek':
+      return `seek: ${formatTime(event.fromTime)} -> ${formatTime(event.toTime)}`;
+    case 'qualityChange':
+      return `qualityChange: ${event.fromQuality === 'auto' ? 'Auto' : `${event.fromQuality}p`} -> ${event.toQuality === 'auto' ? 'Auto' : `${event.toQuality}p`}`;
+    case 'speedChange':
+      return `speedChange: ${event.fromRate}x -> ${event.toRate}x`;
+    case 'fullscreenToggle':
+      return `fullscreenToggle: ${event.isFullscreen ? 'entered' : 'exited'}`;
+    case 'volumeChange':
+      return `volumeChange: ${Math.round(event.fromVolume * 100)}% -> ${Math.round(event.toVolume * 100)}%`;
+    case 'chapterChange':
+      return `chapterChange: ${event.fromChapter?.title ?? 'none'} -> ${event.toChapter?.title ?? 'none'}`;
+    default:
+      return 'unknown';
+  }
+}
+
 function formatTime(value: number) {
   const total = Math.max(0, Math.floor(value));
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
@@ -400,6 +456,7 @@ export function App() {
   const [eventLog, setEventLog] = useState<string[]>([
     'Ready for interaction.'
   ]);
+  const [analyticsEvents, setAnalyticsEvents] = useState<AnalyticsEvent[]>([]);
   const [isPending, startTransition] = useTransition();
   const activePreset = useMemo<PlayerPreset>(
     () =>
@@ -437,7 +494,12 @@ export function App() {
   );
   const usageSnippet = useMemo(
     () =>
-      `import '@mmmihaeel/custom-video-player/styles.css';\nimport { VideoPlayer } from '${PACKAGE_NAME}';\n\nconst source = {\n  type: 'hls' as const,\n  src: '${demoVideo.hlsPlaylistUrl}'\n};\n\nconst chapters = ${JSON.stringify(demoVideo.chapters.slice(0, 2), null, 2)};\n\nexport function Example() {\n  return (\n    <VideoPlayer\n      source={source}\n      durationHint={${demoVideo.videoLength}}\n      chapters={chapters}\n      poster="/poster.png"\n      defaultQuality="auto"\n      defaultVolume={0.72}\n      playbackRates={[0.75, 1, 1.25, 1.5, 2]}\n      theme={{\n        controlColor: '#f8f6f1',\n        railColor: 'rgba(248, 246, 241, 0.28)',\n        menuBackground: 'rgba(17, 20, 27, 0.96)'\n      }}\n    />\n  );\n}`,
+      `import '@mmmihaeel/custom-video-player/styles.css';\nimport {\n  VideoPlayer,\n  type AnalyticsEvent\n} from '${PACKAGE_NAME}';\n\nconst source = {\n  type: 'hls' as const,\n  src: '${demoVideo.hlsPlaylistUrl}'\n};\n\nconst chapters = ${JSON.stringify(demoVideo.chapters.slice(0, 2), null, 2)};\n\nfunction handleAnalyticsEvent(event: AnalyticsEvent) {\n  console.log('[video analytics]', event.type, event);\n}\n\nexport function Example() {\n  return (\n    <VideoPlayer\n      source={source}\n      durationHint={${demoVideo.videoLength}}\n      chapters={chapters}\n      poster="/poster.png"\n      defaultQuality="auto"\n      defaultVolume={0.72}\n      playbackRates={[0.75, 1, 1.25, 1.5, 2]}\n      theme={{\n        controlColor: '#f8f6f1',\n        railColor: 'rgba(248, 246, 241, 0.28)',\n        menuBackground: 'rgba(17, 20, 27, 0.96)'\n      }}\n      onAnalyticsEvent={handleAnalyticsEvent}\n    />\n  );\n}`,
+    []
+  );
+  const analyticsSnippet = useMemo(
+    () =>
+      `import type { AnalyticsEvent } from '${PACKAGE_NAME}';\n\nfunction onAnalyticsEvent(event: AnalyticsEvent) {\n  switch (event.type) {\n    case 'seek':\n      console.log('seek', event.fromTime, event.toTime);\n      break;\n    case 'qualityChange':\n      console.log('quality', event.fromQuality, event.toQuality);\n      break;\n    default:\n      console.log(event.type, event);\n  }\n}`,
     []
   );
   const playerKey = [
@@ -655,6 +717,14 @@ export function App() {
                 )
               }
               onStateChange={(state) => setPlayerState(state)}
+              onAnalyticsEvent={(event) => {
+                console.log('[demo analytics]', event.type, event);
+                appendAnalyticsEvent(setAnalyticsEvents, event);
+                appendEvent(
+                  setEventLog,
+                  `onAnalyticsEvent: ${describeAnalyticsEvent(event)}`
+                );
+              }}
               onQualityChange={(quality) =>
                 appendEvent(
                   setEventLog,
@@ -794,6 +864,23 @@ export function App() {
               <code>theme</code> prop for token-level overrides and{' '}
               <code>className</code>/<code>style</code> when the host app needs
               deeper composition control.
+            </p>
+          </article>
+          <article className={styles.panel}>
+            <div className={styles.cardHeader}>
+              <span className={styles.sectionLabel}>Analytics</span>
+              <h3 className={styles.panelTitle}>
+                Typed events without vendor lock-in
+              </h3>
+            </div>
+            <pre className={styles.codeBlock}>
+              <code>{analyticsSnippet}</code>
+            </pre>
+            <p className={styles.helperNote}>
+              The package emits a discriminated <code>AnalyticsEvent</code>{' '}
+              union. Hosts can branch on <code>event.type</code> and forward the
+              event to any analytics pipeline without coupling the player to a
+              specific SDK or backend.
             </p>
           </article>
           <article className={styles.panel}>
@@ -1028,6 +1115,30 @@ export function App() {
                     ))}
                   </ul>
                 </article>
+                <article className={styles.panel}>
+                  <div className={styles.cardHeader}>
+                    <span className={styles.sectionLabel}>Analytics</span>
+                    <h3 className={styles.panelTitle}>
+                      Latest typed analytics events
+                    </h3>
+                  </div>
+                  <ul className={styles.eventList}>
+                    {analyticsEvents.length > 0 ? (
+                      analyticsEvents.map((event, index) => (
+                        <li key={`${event.type}-${event.timestamp}-${index}`}>
+                          {describeAnalyticsEvent(event)}
+                        </li>
+                      ))
+                    ) : (
+                      <li>Waiting for playback analytics.</li>
+                    )}
+                  </ul>
+                  {analyticsEvents[0] ? (
+                    <pre className={styles.codeBlock}>
+                      <code>{JSON.stringify(analyticsEvents[0], null, 2)}</code>
+                    </pre>
+                  ) : null}
+                </article>
               </div>
             </details>
           </article>
@@ -1086,6 +1197,32 @@ export function App() {
                     <tr key={name}>
                       <td>
                         <code>{name}</code>
+                      </td>
+                      <td>{description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </article>
+          <article className={styles.panel}>
+            <div className={styles.cardHeader}>
+              <span className={styles.sectionLabel}>Analytics</span>
+              <h3 className={styles.panelTitle}>Typed event contract</h3>
+            </div>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Event</th>
+                    <th>Meaning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ANALYTICS_ROWS.map(([type, description]) => (
+                    <tr key={type}>
+                      <td>
+                        <code>{type}</code>
                       </td>
                       <td>{description}</td>
                     </tr>

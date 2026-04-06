@@ -18,7 +18,6 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "declaration": true,
-    "noEmit": true,
-    "baseUrl": "."
+    "noEmit": true
   }
 }

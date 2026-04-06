@@ -4,14 +4,15 @@ The repository combines fast validation with browser-level verification for inte
 
 ## Automated Coverage
 
-| Layer              | Scope                                                                                                |
-| ------------------ | ---------------------------------------------------------------------------------------------------- |
-| Utility tests      | time formatting, chapter normalization, chapter segmentation, and HLS quality mapping                |
-| Demo smoke test    | validates that the demo shell renders and wires the package into the app surface                     |
-| Playwright e2e     | verifies rendered controls, layered settings, keyboard shortcuts, touch seeking, and browser console |
-| Linting            | catches API misuse, TypeScript issues, and hook rule regressions                                     |
-| Type checking      | validates strict TypeScript contracts across the package and demo                                    |
-| Build verification | ensures the package and demo both produce production output                                          |
+| Layer                    | Scope                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| Utility tests            | time formatting, chapter normalization, chapter segmentation, and HLS quality mapping                               |
+| Component contract tests | host-facing component behavior, startup defaults, callback wiring, and typed analytics event emission               |
+| Demo smoke test          | validates that the demo shell renders and wires the package into the app surface                                    |
+| Playwright e2e           | verifies rendered controls, layered settings, keyboard shortcuts, touch seeking, analytics console logs, and errors |
+| Linting                  | catches API misuse, TypeScript issues, and hook rule regressions                                                    |
+| Type checking            | validates strict TypeScript contracts across the package and demo                                                   |
+| Build verification       | ensures the package and demo both produce production output                                                         |
 
 ## Browser Verification
 
@@ -21,6 +22,7 @@ Browser checks verify:
 - timeline hover feedback and touch seeking behavior
 - settings menu layout and selection state
 - keyboard seek and volume shortcuts
+- analytics logging from the demo integration surface
 - runtime console cleanliness during interaction
 
 ## Validation Command

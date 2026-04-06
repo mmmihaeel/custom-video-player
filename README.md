@@ -1,6 +1,6 @@
 # Custom Video Player
 
-`@mmmihaeel/custom-video-player` is a reusable React video player package for HLS playback with custom controls, chapter-aware timeline behavior, quality switching, keyboard shortcuts, Picture-in-Picture, fullscreen, and host-facing callbacks.
+`@mmmihaeel/custom-video-player` is a reusable React video player package for HLS playback with custom controls, chapter-aware timeline behavior, quality switching, typed analytics events, keyboard shortcuts, Picture-in-Picture, fullscreen, and host-facing callbacks.
 
 ## Live Demo
 
@@ -29,7 +29,10 @@ Peer dependencies:
 
 ```tsx
 import '@mmmihaeel/custom-video-player/styles.css';
-import { VideoPlayer } from '@mmmihaeel/custom-video-player';
+import {
+  VideoPlayer,
+  type AnalyticsEvent
+} from '@mmmihaeel/custom-video-player';
 
 const source = {
   type: 'hls' as const,
@@ -42,6 +45,10 @@ const chapters = [
 ];
 
 export function Example() {
+  function onAnalyticsEvent(event: AnalyticsEvent) {
+    console.log('[player analytics]', event.type, event);
+  }
+
   return (
     <VideoPlayer
       source={source}
@@ -51,6 +58,7 @@ export function Example() {
       defaultQuality="auto"
       defaultVolume={0.72}
       playbackRates={[0.75, 1, 1.25, 1.5, 2]}
+      onAnalyticsEvent={onAnalyticsEvent}
     />
   );
 }
@@ -58,13 +66,14 @@ export function Example() {
 
 ## Package Highlights
 
-| Area          | Included                                                                                      |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| Playback      | Play/pause, replay overlay, mute, adaptive audio controls, fullscreen, and Picture-in-Picture |
-| Streaming     | Native HLS when available, lazy `hls.js` fallback otherwise                                   |
-| Timeline      | Chapters, hover tooltip, click-to-seek, and keyboard seeking                                  |
-| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks                        |
-| Delivery      | TypeScript, tests, GitHub Actions, and a live demo                                            |
+| Area          | Included                                                                                                          |
+| ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Playback      | Play/pause, replay overlay, mute, adaptive audio controls, fullscreen, and Picture-in-Picture                     |
+| Streaming     | Lazy `hls.js` transport first for consistent quality switching, with native HLS fallback when required            |
+| Timeline      | Chapters, hover tooltip, click-to-seek, and keyboard seeking                                                      |
+| Extensibility | Metadata, buffering, settings, playback, audio, viewport callbacks, and typed analytics events                    |
+| Architecture  | Single-source runtime orchestrator with internal context slices for controls, timeline, settings, and root wiring |
+| Delivery      | TypeScript, tests, GitHub Actions, and a live demo                                                                |
 
 ## Using The Package
 

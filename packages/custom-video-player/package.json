@@ -1,6 +1,6 @@
 {
   "name": "@mmmihaeel/custom-video-player",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Reusable React video player package with HLS playback, chapter-aware timeline, and custom controls.",
   "author": "mmmihaeel",
   "license": "MIT",

@@ -1,7 +1,7 @@
 {
   "name": "custom-video-player-workspace",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "mmmihaeel",
   "homepage": "https://mmmihaeel.github.io/custom-video-player/",
   "packageManager": "pnpm@10.0.0",
@@ -34,6 +34,7 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^22.15.30",
     "@playwright/test": "^1.58.2",
     "playwright": "^1.58.2",
     "prettier": "^3.8.1"

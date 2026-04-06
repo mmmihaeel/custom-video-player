@@ -94,6 +94,66 @@ export interface VideoPlayerTheme {
   surfaceBackground: string;
 }
 
+type AnalyticsEventBase = {
+  currentTime: number;
+  duration: number;
+  timestamp: number;
+};
+
+export type AnalyticsEvent =
+  | (AnalyticsEventBase & {
+      type: 'play';
+      isMuted: boolean;
+      playbackRate: number;
+      selectedQuality: VideoQualityValue;
+      volume: number;
+    })
+  | (AnalyticsEventBase & {
+      type: 'pause';
+      isMuted: boolean;
+      playbackRate: number;
+      selectedQuality: VideoQualityValue;
+      volume: number;
+    })
+  | (AnalyticsEventBase & {
+      type: 'seek';
+      fromTime: number;
+      toTime: number;
+    })
+  | (AnalyticsEventBase & {
+      type: 'qualityChange';
+      fromQuality: VideoQualityValue;
+      toQuality: VideoQualityValue;
+    })
+  | (AnalyticsEventBase & {
+      type: 'speedChange';
+      fromRate: number;
+      toRate: number;
+    })
+  | (AnalyticsEventBase & {
+      type: 'fullscreenToggle';
+      isFullscreen: boolean;
+    })
+  | (AnalyticsEventBase & {
+      type: 'volumeChange';
+      fromMuted: boolean;
+      fromVolume: number;
+      toMuted: boolean;
+      toVolume: number;
+    })
+  | (AnalyticsEventBase & {
+      type: 'chapterChange';
+      fromChapter: VideoChapter | null;
+      toChapter: VideoChapter | null;
+    })
+  | (AnalyticsEventBase & {
+      type: 'ended';
+      isMuted: boolean;
+      playbackRate: number;
+      selectedQuality: VideoQualityValue;
+      volume: number;
+    });
+
 export interface VideoPlayerProps {
   source: VideoSource;
   chapters?: readonly VideoChapter[];
@@ -131,5 +191,6 @@ export interface VideoPlayerProps {
   onChapterChange?: (chapter: VideoChapter | null) => void;
   onFullscreenChange?: (isFullscreen: boolean) => void;
   onPictureInPictureChange?: (isPictureInPicture: boolean) => void;
+  onAnalyticsEvent?: (event: AnalyticsEvent) => void;
   onError?: (error: Error) => void;
 }

@@ -218,6 +218,27 @@ describe('VideoPlayer', () => {
     expect(screen.getByRole('button', { name: 'Replay' })).toBeInTheDocument();
   });
 
+  it('notifies pause only once when playback reaches the ended state', () => {
+    const onPause = vi.fn();
+    const onEnded = vi.fn();
+    const { container } = renderPlayer({
+      onEnded,
+      onPause
+    });
+    const video = container.querySelector('video');
+
+    if (!video) {
+      throw new Error('Video element was not rendered.');
+    }
+
+    fireEvent.play(video);
+    fireEvent.pause(video);
+    fireEvent.ended(video);
+
+    expect(onPause).toHaveBeenCalledTimes(1);
+    expect(onEnded).toHaveBeenCalledTimes(1);
+  });
+
   it('maps the theme prop to stable CSS variables on the root element', () => {
     const { container } = renderPlayer({
       theme: {

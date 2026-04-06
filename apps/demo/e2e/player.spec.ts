@@ -12,6 +12,18 @@ function trackConsoleErrors(page: Page) {
   return consoleErrors;
 }
 
+function trackConsoleLogs(page: Page, prefix: string) {
+  const consoleLogs: string[] = [];
+
+  page.on('console', (message) => {
+    if (message.type() === 'log' && message.text().includes(prefix)) {
+      consoleLogs.push(message.text());
+    }
+  });
+
+  return consoleLogs;
+}
+
 test('demo renders the player shell and layered settings menu', async ({
   page
 }) => {
@@ -160,6 +172,40 @@ test('preset variants restyle the main player and remount API defaults', async (
   ).toBeVisible();
 });
 
+test('demo logs typed analytics events for desktop interactions', async ({
+  page
+}) => {
+  const analyticsLogs = trackConsoleLogs(page, '[demo analytics]');
+
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByRole('button', { name: 'Pause' }).click();
+
+  await page.getByRole('button', { name: 'Playback settings' }).click();
+  await page.getByRole('button', { name: /^Playback speed/i }).click();
+  await page.getByRole('button', { name: /^1.5x/ }).click();
+
+  await page.getByRole('button', { name: 'Playback settings' }).click();
+  await page.getByRole('button', { name: /^Quality/i }).click();
+  await page.getByRole('button', { name: /^720p/ }).click();
+
+  await page.getByRole('button', { name: 'Enter fullscreen' }).click();
+  await page.getByRole('button', { name: 'Exit fullscreen' }).click();
+
+  await expect
+    .poll(() => analyticsLogs)
+    .toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('[demo analytics] play'),
+        expect.stringContaining('[demo analytics] pause'),
+        expect.stringContaining('[demo analytics] speedChange'),
+        expect.stringContaining('[demo analytics] qualityChange'),
+        expect.stringContaining('[demo analytics] fullscreenToggle')
+      ])
+    );
+});
+
 test.describe('mobile interactions', () => {
   test.use({
     hasTouch: true,
@@ -168,6 +214,8 @@ test.describe('mobile interactions', () => {
   });
 
   test('timeline seeking works on touch layouts', async ({ page }) => {
+    const analyticsLogs = trackConsoleLogs(page, '[demo analytics]');
+
     await page.goto('/');
 
     const timeline = page.getByRole('slider', { name: 'Timeline' });
@@ -196,6 +244,14 @@ test.describe('mobile interactions', () => {
     await expect(
       page.getByRole('button', { name: 'Mute audio' })
     ).toBeVisible();
+
+    await expect
+      .poll(() => analyticsLogs)
+      .toEqual(
+        expect.arrayContaining([
+          expect.stringContaining('[demo analytics] seek')
+        ])
+      );
   });
 
   test('compact mobile layout keeps secondary actions reachable', async ({

@@ -1,5 +1,6 @@
 export { VideoPlayer } from './components/VideoPlayer';
 export type {
+  AnalyticsEvent,
   VideoPlayerBufferedPayload,
   VideoChapter,
   VideoPlayerLabels,

@@ -1,6 +1,6 @@
 # @mmmihaeel/custom-video-player
 
-`@mmmihaeel/custom-video-player` is a reusable React component for HLS playback with custom controls, chapter-aware timeline behavior, quality switching, fullscreen, Picture-in-Picture, and callback-driven host integration.
+`@mmmihaeel/custom-video-player` is a reusable React component for HLS playback with custom controls, chapter-aware timeline behavior, quality switching, typed analytics events, fullscreen, Picture-in-Picture, and callback-driven host integration.
 
 ## Installation
 
@@ -25,7 +25,10 @@ Peer dependencies:
 
 ```tsx
 import '@mmmihaeel/custom-video-player/styles.css';
-import { VideoPlayer } from '@mmmihaeel/custom-video-player';
+import {
+  VideoPlayer,
+  type AnalyticsEvent
+} from '@mmmihaeel/custom-video-player';
 
 const source = {
   type: 'hls' as const,
@@ -38,6 +41,10 @@ const chapters = [
 ];
 
 export function Example() {
+  function onAnalyticsEvent(event: AnalyticsEvent) {
+    console.log('[player analytics]', event.type, event);
+  }
+
   return (
     <VideoPlayer
       source={source}
@@ -53,6 +60,7 @@ export function Example() {
         railColor: 'rgba(248, 246, 241, 0.28)',
         menuBackground: 'rgba(17, 20, 27, 0.96)'
       }}
+      onAnalyticsEvent={onAnalyticsEvent}
     />
   );
 }
@@ -101,13 +109,14 @@ Supported theme keys:
 
 ## Feature Summary
 
-| Area          | Included                                                                                                |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| Playback UI   | Play/pause, replay overlay, desktop volume rail, compact mobile mute-first control, fullscreen, and PiP |
-| Streaming     | `hls.js`-driven manual quality selection with native fallback when required                             |
-| Timeline      | Chapter markers, hover tooltip, click-to-seek, keyboard seeking                                         |
-| Settings      | Manual quality selection and playback-rate menu                                                         |
-| Extensibility | Metadata, buffering, settings, playback, audio, and viewport callbacks                                  |
+| Area          | Included                                                                                                  |
+| ------------- | --------------------------------------------------------------------------------------------------------- |
+| Playback UI   | Play/pause, replay overlay, desktop volume rail, compact mobile mute-first control, fullscreen, and PiP   |
+| Streaming     | `hls.js`-driven manual quality selection with native fallback when required                               |
+| Timeline      | Chapter markers, hover tooltip, click-to-seek, keyboard seeking                                           |
+| Settings      | Manual quality selection and playback-rate menu                                                           |
+| Extensibility | Metadata, buffering, settings, playback, audio, viewport callbacks, and typed analytics events            |
+| Runtime       | Single-source orchestrator with internal context slices for controls, timeline, settings, and root wiring |
 
 ## Props
 
@@ -145,7 +154,8 @@ Supported theme keys:
 | `onBufferedChange`         | `(payload: VideoPlayerBufferedPayload) => void` | Buffering state changed                                           |
 | `onStateChange`            | `(state: VideoPlayerState) => void`             | Normalized runtime snapshot for host orchestration                |
 | `onWaitingChange`          | `(isWaiting: boolean) => void`                  | Buffering state toggled                                           |
-| `onQualityChange`          | `(quality: VideoQualityValue) => void`          | Quality selection changed                                         |
+| `onAnalyticsEvent`         | `(event: AnalyticsEvent) => void`               | Typed analytics stream for meaningful playback interactions       |
+| `onQualityChange`          | `(quality: VideoQualityValue) => void`          | User-selected quality preference changed                          |
 | `onPlaybackRateChange`     | `(rate: number) => void`                        | Playback speed changed                                            |
 | `onVolumeChange`           | `(volume: number) => void`                      | Volume changed                                                    |
 | `onMuteChange`             | `(muted: boolean) => void`                      | Mute state changed                                                |
@@ -155,6 +165,47 @@ Supported theme keys:
 | `onFullscreenChange`       | `(isFullscreen: boolean) => void`               | Fullscreen state changed                                          |
 | `onPictureInPictureChange` | `(isPictureInPicture: boolean) => void`         | PiP state changed                                                 |
 | `onError`                  | `(error: Error) => void`                        | Stream or media error surfaced                                    |
+
+## Analytics Event Contract
+
+`onAnalyticsEvent` emits a discriminated union instead of a generic `{ name, payload }` object, so package consumers can branch on `event.type` with full TypeScript narrowing.
+
+```tsx
+function onAnalyticsEvent(event: AnalyticsEvent) {
+  switch (event.type) {
+    case 'seek':
+      console.log(event.fromTime, event.toTime);
+      break;
+    case 'qualityChange':
+      console.log(event.fromQuality, event.toQuality);
+      break;
+    default:
+      console.log(event.type, event);
+  }
+}
+```
+
+All analytics events share:
+
+- `currentTime`
+- `duration`
+- `timestamp`
+
+Event-specific payloads:
+
+| Event              | Additional fields                                      |
+| ------------------ | ------------------------------------------------------ |
+| `play`             | `isMuted`, `playbackRate`, `selectedQuality`, `volume` |
+| `pause`            | `isMuted`, `playbackRate`, `selectedQuality`, `volume` |
+| `seek`             | `fromTime`, `toTime`                                   |
+| `qualityChange`    | `fromQuality`, `toQuality`                             |
+| `speedChange`      | `fromRate`, `toRate`                                   |
+| `fullscreenToggle` | `isFullscreen`                                         |
+| `volumeChange`     | `fromMuted`, `fromVolume`, `toMuted`, `toVolume`       |
+| `chapterChange`    | `fromChapter`, `toChapter`                             |
+| `ended`            | `isMuted`, `playbackRate`, `selectedQuality`, `volume` |
+
+The package does not ship vendor-specific analytics SDKs or network transport. Hosts remain responsible for forwarding these events to their own telemetry stack.
 
 ## Labels
 
@@ -186,3 +237,5 @@ Supported theme keys:
 - `hls.js` is lazy-loaded so consumers do not pay for the runtime until it is required.
 - Pointer events drive seeking behavior on desktop and touch devices alike.
 - Compact mobile layouts keep the visible control row focused on playback-first actions, while secondary viewport actions move into the settings sheet.
+- The runtime stays host-agnostic: analytics, persistence, auth, and backend communication remain outside the package.
+- Internally the public component is backed by a single `useVideoPlayer` orchestrator plus `VideoPlayerContext` slice hooks, which reduces prop drilling without exposing internal wiring as public API.
